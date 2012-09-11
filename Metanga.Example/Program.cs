@@ -13,7 +13,7 @@ namespace Metanga.Example
   {
     static void Main(string[] args)
     {
-      // Example of an Enrollment to a Package that has a Reservation Product
+      //  Example of an Enrollment to a Package that has a Reservation Product
       // Please set the following values to appropriate values
       var paymentBrokerAddress = "https://tenant.mypaymentaccess.com";
       var address = new Uri("https://tenant.mybillaccess.com", UriKind.Absolute);
