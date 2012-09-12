@@ -35,14 +35,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\SaaS.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>bin\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\bin\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -67,6 +67,9 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\SaaS.snk">
+      <Link>SaaS.snk</Link>
+    </None>
     <None Include="app.config" />
     <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.Account.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
@@ -89,6 +92,11 @@
     <None Include="Service References\Proxy\Metanga.wsdl" />
   </ItemGroup>
   <ItemGroup>
+    <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
+      <Link>CustomDictionary.xml</Link>
+    </CodeAnalysisDictionary>
+  </ItemGroup>
+  <ItemGroup>
     <WCFMetadataStorage Include="Service References\Proxy\" />
   </ItemGroup>
   <ItemGroup>
@@ -98,7 +106,6 @@
     <None Include="Service References\Proxy\configuration.svcinfo" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\Proxy\Metanga2.wsdl" />
     <None Include="Service References\Proxy\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>

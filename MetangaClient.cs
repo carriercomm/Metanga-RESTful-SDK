@@ -146,13 +146,19 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
 
     #endregion
 
-
     #region Constructors
 
     private MetangaClient(Uri address, string userName, string password, MetangaContentType contentType)
     {
       if (contentType != MetangaContentType.Json)
         throw new NotImplementedException("Processing of data in the format of XML has not been implemented yet.");
+
+      if (address == null)
+        throw new ArgumentNullException("address");
+      if (string.IsNullOrEmpty(userName))
+        throw new ArgumentNullException("userName");
+      if (string.IsNullOrEmpty(password))
+        throw new ArgumentNullException("password");
 
       ServiceAddress = address;
       UserName = userName;
@@ -223,6 +229,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
           httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
           httpClient.DefaultRequestHeaders.Add("X-Metanga-InvoiceAction", invoiceAction.ToString());
           var response = httpClient.PostAsync(enrollmentAddress, enrollParamsContent).Result;
+          CheckResponse(response, HttpStatusCode.Created);
           var responseContent = response.Content.ReadAsStreamAsync();
           using (var streamReader = new StreamReader(responseContent.Result, Encoding))
           {
@@ -253,6 +260,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
           httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
           httpClient.DefaultRequestHeaders.Add("X-Metanga-InvoiceAction", invoiceAction.ToString());
           var response = httpClient.PostAsync(subscribeAddress, subscriptionSerialized).Result;
+          CheckResponse(response, HttpStatusCode.Created);
           var responseContent = response.Content.ReadAsStreamAsync();
           using (var streamReader = new StreamReader(responseContent.Result, Encoding))
           {
@@ -290,6 +298,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
           httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
           httpClient.DefaultRequestHeaders.Add("X-Metanga-InvoiceAction", invoiceAction.ToString());
           var response = httpClient.PutAsync(subscribeAddress, subscriptionSerialized).Result;
+          CheckResponse(response, HttpStatusCode.Created);
           var responseContent = response.Content.ReadAsStreamAsync();
           using (var streamReader = new StreamReader(responseContent.Result, Encoding))
           {
@@ -401,6 +410,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         using (var httpClient = new HttpClient())
         {
           var response = httpClient.PostAsync(sessionAddress, credentialsContent).Result;
+          CheckResponse(response, HttpStatusCode.Created);
           var responseContent = response.Content.ReadAsStreamAsync();
           using (var streamReader = new StreamReader(responseContent.Result, Encoding))
           {
