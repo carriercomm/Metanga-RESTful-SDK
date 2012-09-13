@@ -24,7 +24,7 @@
     <DocumentationFile>
     </DocumentationFile>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,11 +38,11 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\SaaS.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>MetangaSDK.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\bin\Newtonsoft.Json.dll</HintPath>
+      <HintPath>bin\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -67,10 +67,8 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\SaaS.snk">
-      <Link>SaaS.snk</Link>
-    </None>
     <None Include="app.config" />
+    <None Include="MetangaSDK.snk" />
     <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.Account.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -92,11 +90,6 @@
     <None Include="Service References\Proxy\Metanga.wsdl" />
   </ItemGroup>
   <ItemGroup>
-    <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
-      <Link>CustomDictionary.xml</Link>
-    </CodeAnalysisDictionary>
-  </ItemGroup>
-  <ItemGroup>
     <WCFMetadataStorage Include="Service References\Proxy\" />
   </ItemGroup>
   <ItemGroup>
@@ -110,6 +103,9 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="MetangaSDKDictionary.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

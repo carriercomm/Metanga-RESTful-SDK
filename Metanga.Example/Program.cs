@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Net.Http;
 using Metanga.SoftwareDevelopmentKit.Proxy;
@@ -59,7 +58,7 @@ namespace Metanga.Example
                                            StartDate = enrollmentDate
                                          };
 
-      var subscriptionPackageProducts = new Collection<SubscriptionPackageProduct> {subscriptionPackageProduct};
+      var subscriptionPackageProducts = new [] {subscriptionPackageProduct};
       
       var subscription = new SampleSubscription
                            {
