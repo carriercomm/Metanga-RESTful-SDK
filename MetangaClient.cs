@@ -46,12 +46,12 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     }
 
     #endregion
-    
+
     #region Private static fields
 
     private static readonly Encoding Encoding = new UTF8Encoding(false, true);
     private static readonly JsonSerializer JsonSerializer = CreateJsonSerializer();
-    
+
     #endregion
 
     #region Private static methods
@@ -62,23 +62,25 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         return;
       GenerateExceptionFromResponse(response);
     }
+
     private static void GenerateExceptionFromResponse(HttpResponseMessage httpResponseMessage)
     {
-      if (httpResponseMessage == null) 
+      if (httpResponseMessage == null)
         throw new ArgumentNullException("httpResponseMessage");
       using (var streamReader = new StreamReader(httpResponseMessage.Content.ReadAsStreamAsync().Result, Encoding))
       {
         var jsonTextReader = new JsonTextReader(streamReader);
-        var errorJsonObject = (dynamic)JsonSerializer.Deserialize(jsonTextReader);
+        var errorJsonObject = (dynamic) JsonSerializer.Deserialize(jsonTextReader);
 
         var errorId = Guid.Parse(errorJsonObject.ErrorId.ToString());
         var errorMessage = errorJsonObject.ErrorMessage.ToString();
         throw new MetangaException(errorMessage, errorId);
       }
     }
+
     private static Guid GetEntityIdFromResponse(HttpResponseMessage httpResponseMessage)
     {
-      if (httpResponseMessage == null) 
+      if (httpResponseMessage == null)
         throw new ArgumentNullException("httpResponseMessage");
       using (var streamReader = new StreamReader(httpResponseMessage.Content.ReadAsStreamAsync().Result, Encoding))
       {
@@ -104,7 +106,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     {
       if (jsonValue == null) throw new ArgumentNullException("jsonValue");
       if (httpStream == null) throw new ArgumentNullException("httpStream");
-      using (var jsonTextWriter = new JsonTextWriter(new StreamWriter(httpStream, Encoding)) { CloseOutput = false })
+      using (var jsonTextWriter = new JsonTextWriter(new StreamWriter(httpStream, Encoding)) {CloseOutput = false})
       {
         jsonValue.WriteTo(jsonTextWriter);
         jsonTextWriter.Flush();
@@ -115,10 +117,11 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       jsonContent.Headers.ContentType = contentType;
       return jsonContent;
     }
+
     private static StreamContent SerializeObjectToJsonContent(object entity, Stream entityStream)
     {
       if (entityStream == null) throw new ArgumentNullException("entityStream");
-      var jsonTextWriter = new JsonTextWriter(new StreamWriter(entityStream, Encoding)) { CloseOutput = false };
+      var jsonTextWriter = new JsonTextWriter(new StreamWriter(entityStream, Encoding)) {CloseOutput = false};
       JsonSerializer.Serialize(jsonTextWriter, entity);
       jsonTextWriter.Flush();
       entityStream.Seek(0, SeekOrigin.Begin);
@@ -126,10 +129,11 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
       return streamContent;
     }
+
     private static StreamContent SerializeToJsonContent(Entity entity, Stream entityStream)
     {
       if (entityStream == null) throw new ArgumentNullException("entityStream");
-      var jsonTextWriter = new JsonTextWriter(new StreamWriter(entityStream, Encoding)) { CloseOutput = false };
+      var jsonTextWriter = new JsonTextWriter(new StreamWriter(entityStream, Encoding)) {CloseOutput = false};
       JsonSerializer.Serialize(jsonTextWriter, entity);
       jsonTextWriter.Flush();
       entityStream.Seek(0, SeekOrigin.Begin);
@@ -137,11 +141,12 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
       return streamContent;
     }
+
     private static KeyValuePair<string, string> GetEntityIdentificator(Entity entity)
     {
-      return !string.IsNullOrEmpty(entity.ExternalId) ?
-        new KeyValuePair<string, string>(entity.ExternalId, TypeOfIdExternal) :
-        new KeyValuePair<string, string>(entity.EntityId.GetValueOrDefault().ToString(), TypeOfIdMetanga);
+      return !string.IsNullOrEmpty(entity.ExternalId)
+               ? new KeyValuePair<string, string>(entity.ExternalId, TypeOfIdExternal)
+               : new KeyValuePair<string, string>(entity.EntityId.GetValueOrDefault().ToString(), TypeOfIdMetanga);
     }
 
     #endregion
@@ -171,7 +176,8 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
 
     #region Delegates
 
-    private delegate Task<HttpResponseMessage> ProcessRequest(HttpClient httpClient, Uri serviceUri, StreamContent messageContent);
+    private delegate Task<HttpResponseMessage> ProcessRequest(
+      HttpClient httpClient, Uri serviceUri, StreamContent messageContent);
 
     #endregion
 
@@ -209,6 +215,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     #endregion
 
     #region Public methods
+
     /// <summary>
     /// Enroll method
     /// </summary>
@@ -216,10 +223,10 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     /// <param name="account">new account entity</param>
     /// <param name="invoiceAction">Invoice action</param>
     /// <returns>return new invoice</returns>
-    public Invoice Enroll(Subscription subscription, Account account,InvoiceAction invoiceAction)
+    public Invoice Enroll(Subscription subscription, Account account, InvoiceAction invoiceAction)
     {
       var enrollmentAddress = new Uri(ServiceAddress, RestServiceEnrollment);
-      var enrollParams = new { Subscription = subscription, Account = account };
+      var enrollParams = new {Subscription = subscription, Account = account};
       using (var credentialStream = new MemoryStream())
       {
         var enrollParamsContent = SerializeObjectToJsonContent(enrollParams, credentialStream);
@@ -234,7 +241,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
           using (var streamReader = new StreamReader(responseContent.Result, Encoding))
           {
             var jsonTextReader = new JsonTextReader(streamReader);
-            returnInvoice = (Invoice)JsonSerializer.Deserialize(jsonTextReader, typeof(Invoice));
+            returnInvoice = (Invoice) JsonSerializer.Deserialize(jsonTextReader, typeof (Invoice));
           }
         }
         return returnInvoice;
@@ -247,7 +254,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     /// <param name="subscription">Metanga subscription entity to Subscribe</param>
     /// <param name="invoiceAction">Invoice action.</param>
     /// <returns>Metanga ID of newely created entity</returns>
-    public Invoice Subscribe(Subscription subscription, InvoiceAction invoiceAction = InvoiceAction.InvoiceNext)
+    public Invoice Subscribe(Subscription subscription, InvoiceAction invoiceAction)
     {
       var subscribeAddress = new Uri(ServiceAddress, RestServiceSubscribe);
       //var subscribeParams = new { Subscription = subscription };
@@ -265,11 +272,21 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
           using (var streamReader = new StreamReader(responseContent.Result, Encoding))
           {
             var jsonTextReader = new JsonTextReader(streamReader);
-            returnInvoice = (Invoice)JsonSerializer.Deserialize(jsonTextReader, typeof(Invoice));
+            returnInvoice = (Invoice) JsonSerializer.Deserialize(jsonTextReader, typeof (Invoice));
           }
         }
         return returnInvoice;
       }
+    }
+
+    /// <summary>
+    /// Create an entity to database and return EntityId. If error occurred, MetangaException should be raised
+    /// </summary>
+    /// <param name="subscription">Metanga subscription entity to Subscribe</param>
+    /// <returns>Metanga ID of newely created entity</returns>
+    public Invoice Subscribe(Subscription subscription)
+    {
+      return Subscribe(subscription, InvoiceAction.InvoiceNext);
     }
 
     /// <summary>
@@ -279,7 +296,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     /// <param name="effectiveDate">Effective date for termination,</param>
     /// <param name="invoiceAction">Invoice action.</param>
     /// <returns>Metanga ID of newely created entity</returns>
-    public Invoice Modify(Subscription subscription, DateTime? effectiveDate, InvoiceAction invoiceAction = InvoiceAction.InvoiceNext)
+    public Invoice Modify(Subscription subscription, DateTime? effectiveDate, InvoiceAction invoiceAction)
     {
       var subscribeAddress = new Uri(ServiceAddress, RestServiceSubscribe);
       
@@ -308,6 +325,17 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         }
         return returnInvoice;
       }
+    }
+
+    /// <summary>
+    /// Modify subscription. If error occurred, MetangaException should be raised
+    /// </summary>
+    /// <param name="subscription">Metanga subscription entity to Modify</param>
+    /// <param name="effectiveDate">Effective date for termination,</param>
+    /// <returns>Metanga ID of newely created entity</returns>
+    public Invoice Modify(Subscription subscription, DateTime? effectiveDate)
+    {
+      return Modify(subscription, effectiveDate, InvoiceAction.InvoiceNext);
     }
 
     /// <summary>
