@@ -78,7 +78,7 @@ namespace Metanga.Example
                                                         account.LastName, account.MiddleInitial, account.PhoneNumber,
                                                         account.Zip, account.State);
 
-      account.PaymentInstrumentId = creditCardToken; // add the payment instrument id returned by payment broker to the account
+      account.PaymentInstruments = new []{ new PaymentInstrumentMasked{InstrumentId = creditCardToken}}; // add the payment instrument id returned by payment broker to the account
 
       var client = MetangaClient.Initialize(address, username, password, MetangaContentType.Json);
       client.Enroll(subscription, account, InvoiceAction.InvoiceNext);
