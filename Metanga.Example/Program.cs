@@ -145,12 +145,18 @@ namespace Metanga.Example
     /// <returns></returns>
     private static SampleSubscription CreateSubscription(string externalAccountId, string externalSubscriptionId)
     {
+      // These are the identifiers of a package and a product in Metanga's demo database.
       var packageId = new Guid("7923810c-8c96-4ff6-ac11-adae1303d8c3");
       var productId = new Guid("5ae6e359-2534-474f-8e48-1906f6f158fc");
+      // This product is for a cloud storage product, priced at $10 / Megabit / Mo.
+      // Enroll this customer for 5 Megabits (a more realistic example would use Gigabytes!)
       const int quantity = 5;
       const string unit = "MABIT";
+
+      // Start enrollment on August 1st, 2012
       var enrollmentDate = new DateTime(2012, 8, 1);
 
+      // Assemble the subscription object
       var subscriptionPackageProduct = new SubscriptionPackageProduct
       {
         Product = new Product { EntityId = productId },
