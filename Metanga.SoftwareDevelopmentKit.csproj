@@ -82,13 +82,13 @@
     <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.Invoice.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.InvoiceReport.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
     <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.Package.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\Proxy\Metanga.wsdl" />
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="MetangaSDKDictionary.xml" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\Proxy\" />
@@ -104,9 +104,6 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <CodeAnalysisDictionary Include="MetangaSDKDictionary.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
