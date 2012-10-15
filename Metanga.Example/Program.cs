@@ -17,8 +17,7 @@ namespace Metanga.Example
     /// <summary>
     /// Main entry point
     /// </summary>
-    /// <param name="args">No arguments are required</param>
-    private static void Main(string[] args)
+    private static void Main()
     {
       Console.WriteLine("Opening connection to Metanga...");
       var client = OpenMetangaClient();
@@ -28,8 +27,28 @@ namespace Metanga.Example
         return;
       }
 
+      Console.WriteLine("Running Product Creation Example...");
+      var externalProductId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+      var product = CreateProduct(externalProductId);
+      var productId = CreateEntityExample(client, product);
+      if (productId == null)
+      {
+        EndExample();
+        return;
+      }
+
+      Console.WriteLine("Running Package Creation Example...");
+      var externalPackageId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+      var package = CreatePackage(externalPackageId, externalProductId);
+      var packageId = CreateEntityExample(client, package);
+      if (packageId == null)
+      {
+        EndExample();
+        return;
+      }
+
       Console.WriteLine("Running Enrollment Example...");
-      EnrollmentExample(client);
+      EnrollmentExample(client, externalPackageId, externalProductId);
       Console.WriteLine("Closing connection to Metanga...");
       CloseMetangaClient(client);
       EndExample();
@@ -39,7 +58,9 @@ namespace Metanga.Example
     /// Enrolls an account to a predefined package. Then shows invoice information.
     /// </summary>
     /// <param name="client">A Metanga client that has been initialized.</param>
-    private static void EnrollmentExample(MetangaClient client)
+    /// <param name="externalPackageId">The Id of the package to use for the subscription</param>
+    /// <param name="externalProductId">The Id of the product to use for the subscription</param>
+    private static void EnrollmentExample(MetangaClient client, string externalPackageId, string externalProductId)
     {
       // Generate an id that will be different for each execution of this example
       var externalAccountId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
@@ -47,7 +68,7 @@ namespace Metanga.Example
 
       // Populate an account and a subscription.
       var account = CreateAccount(externalAccountId);
-      var subscription = CreateSubscription(externalAccountId, externalSubscriptionId);
+      var subscription = CreateSubscription(externalPackageId, externalProductId, externalAccountId, externalSubscriptionId);
 
       // Create a credit card in Payment Broker and add the token to the account
       var creditCardToken = CreateCreditCardInPaymentBroker(account);
@@ -83,6 +104,20 @@ namespace Metanga.Example
       }
     }
 
+    private static Guid? CreateEntityExample(MetangaClient client, Entity entity)
+    {
+      Guid? entityId = null;
+      try
+      {
+        entityId = client.CreateEntity(entity);
+      }
+      catch (MetangaException e)
+      {
+        Console.WriteLine("An error has occurred during enrollment: Id={0}, Message={1}", e.ErrorId, e.Message);
+      }
+      return entityId;
+    }
+
     /// <summary>
     /// Creates a credit card in the payment broker. The account object provides contact information to be
     /// associated to the credit card. This method sets hardcoded values for the credit card.
@@ -108,6 +143,64 @@ namespace Metanga.Example
                                          account.Zip, account.State);
     }
 
+    private static SampleProduct CreateProduct(string externalProductId)
+    {
+      // Create a Reservation Product for Cloud Storage. You can buy online storage at a price of $0.10 / Gigabyte / Month
+      return new SampleProduct
+               {
+                 ExternalId = externalProductId,
+                 Name = new Dictionary<string, string> { { "en-us", externalProductId } },
+                 PriceSchedule = CreatePriceSchedule(0.10m),
+                 Taxable = true,
+                 // A time-based product will automatically prorate charges based on start and end date
+                 TimeBased = true,
+                 // A list of out-of-box unit group codes can be found here: https://demo.mybillaccess.com/WebServices/html/T_Metanga_Domain_Configuration_UnitsOfMeasure_UnitGroup.htm
+                 UnitGroup = new UnitGroup { EntityId = new Guid("1e559a2e-70b5-43a7-a4b7-f9b01c6067aa") }
+               };
+    }
+
+    private static SamplePackage CreatePackage(string externalPackageId, string externalProductId)
+    {
+      // Create a Package to bill for Cloud Storage. This is a special package with a discounted price of $0.09 / Gigabyte / Month
+
+      var packageProduct = new PackageProduct
+                             {
+                               EventModel = EventModel.Recurring,
+                               Product = new Product { ExternalId = externalProductId },
+                               PriceSchedule = CreatePriceSchedule(0.09m)
+                             };
+
+      return new SamplePackage
+      {
+        ExternalId = externalPackageId,
+        Name = new Dictionary<string, string> { { "en-us", externalPackageId } },
+        AdvanceRecurringEvents = true,
+        RecurringChargeCycle = new [] { "MO" },
+        PackageProducts = new [] { packageProduct }
+      };
+    }
+
+    /// <summary>
+    /// Creates a simple Price Schedule for the Cloud Storage product
+    /// </summary>
+    /// <param name="price">The US$ price to charge for each Gigabyte / Month of use</param>
+    /// <returns>A price schedule object that can be associated in a product, package, or subscription</returns>
+    private static PriceSchedule CreatePriceSchedule(Decimal price)
+    {
+      var unitPrice = new UnitPrice
+                        {
+                          UsageUnitId = "GIBBY",
+                          TimeUnitId = "MO",
+                          Price = new Dictionary<string, Decimal> {{"USD", price}}
+                        };
+      var interval = new PriceScheduleInterval
+                       {
+                          StartDate = new DateTime(2010, 1, 1),
+                          UnitPrices = new [] { unitPrice }
+                       };
+      return new PriceSchedule { Intervals = new [] { interval }};
+    }
+    
     /// <summary>
     /// Populate an account object with some hardcoded values
     /// </summary>
@@ -131,7 +224,7 @@ namespace Metanga.Example
                  Country = "US",
                  PhoneNumber = "555-555-5555",
                  BillingCycleUnit = "MO", // Monthly
-                 BillingCycleEndDate = new DateTime(2012, 1, 31), // Last Day of Month
+                 BillingCycleEndDate = new DateTime(2012, 1, 31), // Last Day of Month. For anniversary billing use today - 1 day.
                  Currency = "USD",
                  Payer = new Account {ExternalId = externalAccountId} // Self-Paid
                };
@@ -140,26 +233,26 @@ namespace Metanga.Example
     /// <summary>
     /// Populates a subscription object with some hardcoded values.
     /// </summary>
+    /// <param name="externalPackageId">The external id of the package to be subscribed</param>
+    /// <param name="externalProductId">The external id of the product in this package</param>
     /// <param name="externalAccountId">The external id of the account that is being subscribed</param>
     /// <param name="externalSubscriptionId">An external id that can be used to subsequently retrieve, update, or delete the subscription</param>
     /// <returns></returns>
-    private static SampleSubscription CreateSubscription(string externalAccountId, string externalSubscriptionId)
+    private static SampleSubscription CreateSubscription(string externalPackageId, string externalProductId, string externalAccountId, string externalSubscriptionId)
     {
-      // These are the identifiers of a package and a product in Metanga's demo database.
-      var packageId = new Guid("7923810c-8c96-4ff6-ac11-adae1303d8c3");
-      var productId = new Guid("5ae6e359-2534-474f-8e48-1906f6f158fc");
       // This product is for a cloud storage product, priced at $10 / Megabit / Mo.
-      // Enroll this customer for 5 Megabits (a more realistic example would use Gigabytes!)
-      const int quantity = 5;
-      const string unit = "MABIT";
+      // Enroll this customer for 1000 Gigabytes
+      const Decimal quantity = 1000m;
+      const string unit = "GIBBY";
 
-      // Start enrollment on August 1st, 2012
-      var enrollmentDate = new DateTime(2012, 8, 1);
+      // Start enrollment on the first day of the current month
+      var today = DateTime.Today;
+      var enrollmentDate = new DateTime(today.Year, today.Month, 1);
 
       // Assemble the subscription object
       var subscriptionPackageProduct = new SubscriptionPackageProduct
       {
-        Product = new Product { EntityId = productId },
+        Product = new Product { ExternalId = externalProductId },
         Quantity = quantity,
         UnitId = unit,
         StartDate = enrollmentDate
@@ -171,7 +264,7 @@ namespace Metanga.Example
       {
         ExternalId = externalSubscriptionId,
         Account = new Account { ExternalId = externalAccountId },
-        Package = new Package { EntityId = packageId },
+        Package = new Package { ExternalId = externalPackageId },
         RecurringCycleUnitId = "MO",
         SubscriptionPackageProducts = subscriptionPackageProducts
       };
