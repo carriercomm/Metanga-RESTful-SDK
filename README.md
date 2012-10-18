@@ -21,7 +21,7 @@ text editor (or in Visual Studio) and set the address and credentials for your M
 
 This shows the output from the Metanga Example program:
 
-![Metanga Example Output](./MetangaSDKExampleOutput.png)
+![Metanga Example Output](https://raw.github.com/MetangaSDK/Metanga-RESTful-SDK/master/MetangaSDKExampleOutput.png)
 
 After running your initial example, you can make adjustments to create packages, products, and
 subscriptions that meet your business needs and integrate with your applications.
