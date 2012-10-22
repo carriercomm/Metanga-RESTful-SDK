@@ -18,10 +18,10 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="https://vmbaasdev12.metratech.com/wsdl" Protocol="http" SourceId="1" />
+    <MetadataSource Address="https://vmbaasdev18.metratech.com/wsdl" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="Metanga.wsdl" MetadataType="Wsdl" ID="1645923d-9c56-4987-9fdd-55f4187f8d41" SourceId="1" SourceUrl="https://vmbaasdev12.metratech.com/wsdl/" />
+    <MetadataFile FileName="Metanga1.wsdl" MetadataType="Wsdl" ID="b58ce0ab-1767-4243-a435-f357d3f07881" SourceId="1" SourceUrl="https://vmbaasdev18.metratech.com/wsdl/" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
