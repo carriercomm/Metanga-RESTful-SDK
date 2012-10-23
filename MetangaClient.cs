@@ -25,6 +25,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     private static readonly Uri RestServiceSession = new Uri("RestService/session", UriKind.Relative);
     private static readonly Uri RestServiceEnrollment = new Uri("RestService/enrollment", UriKind.Relative);
     private static readonly Uri RestServiceSubscribe = new Uri("RestService/subscribe", UriKind.Relative);
+    private static readonly Uri RestServiceBulk = new Uri("RestService/bulk", UriKind.Relative);
     private const string TypeOfIdMetanga = "Metanga";
     private const string TypeOfIdExternal = "External";
 
@@ -336,6 +337,34 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     public Invoice Modify(Subscription subscription, DateTime? effectiveDate)
     {
       return Modify(subscription, effectiveDate, InvoiceAction.InvoiceNext);
+    }
+
+    /// <summary>
+    /// Create a entities to database and return EntitiesId. If error occurred, MetangaException should be raised
+    /// </summary>
+    /// <param name="newEntities">Metanga entities to create</param>
+    /// <returns>Metanga ID collection of newely created entities</returns>
+    public IEnumerable<Guid> CreateEntityBulk(IEnumerable<Entity> newEntities)
+    {
+      var enrollmentAddress = new Uri(ServiceAddress, RestServiceBulk);
+      using (var credentialStream = new MemoryStream())
+      {
+        var enrollParamsContent = SerializeObjectToJsonContent(newEntities, credentialStream);
+        IEnumerable<Guid> entitiesGuids;
+        using (var httpClient = new HttpClient())
+        {
+          PopulateSessionHeader(httpClient, null);
+          var response = httpClient.PostAsync(enrollmentAddress, enrollParamsContent).Result;
+          CheckResponse(response, HttpStatusCode.Created);
+          var responseContent = response.Content.ReadAsStreamAsync();
+          using (var streamReader = new StreamReader(responseContent.Result, Encoding))
+          {
+            var jsonTextReader = new JsonTextReader(streamReader);
+            entitiesGuids = JsonSerializer.Deserialize<IEnumerable<Guid>>(jsonTextReader);
+          }
+        }
+        return entitiesGuids;
+      }
     }
 
     /// <summary>
