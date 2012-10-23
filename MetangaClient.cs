@@ -432,7 +432,32 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     {
       return RetrieveEntity<T>(TypeOfIdExternal, externalId);
     }
-
+    
+    /// <summary>
+    /// Retrieve entities from database. If error occurred,  MetangaException should be raised
+    /// </summary>
+    /// <typeparam name="T">Type of Metanga entity </typeparam>
+    /// <returns>Metanga entity</returns>
+    public IEnumerable<T> RetrieveEntitiesBulk<T>() where T : Entity, new()
+    {
+      var serviceUri = CombineUri(RestServiceBulk.ToString(), typeof(T).Name);
+      IEnumerable<T> entity;
+      using (var httpClient = new HttpClient())
+      {
+        PopulateSessionHeader(httpClient, null);
+        using (var result = httpClient.GetAsync(serviceUri))
+        {
+          var response = result.Result;
+          CheckResponse(response, HttpStatusCode.OK);
+          using (var streamReader = new StreamReader(response.Content.ReadAsStreamAsync().Result, Encoding))
+          {
+            var jsonTextReader = new JsonTextReader(streamReader);
+            entity = JsonSerializer.Deserialize<IEnumerable<T>>(jsonTextReader);
+          }
+        }
+      }
+      return entity;
+    }
     /// <summary>
     /// Close session
     /// </summary>
@@ -528,7 +553,10 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     }
     private Uri CombineUri(params string[] segments)
     {
-      var uri = new StringBuilder("RestService");
+      const string restService = "RestService";
+      var uri = new StringBuilder();
+      if (!segments[0].Contains(restService))
+        uri.Append(restService);
       foreach (var segment in segments)
         uri.Append("/" + segment);
       var relativeUri = new Uri(uri.ToString(), UriKind.Relative);
