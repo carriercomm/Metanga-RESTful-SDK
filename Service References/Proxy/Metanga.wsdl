@@ -124,14 +124,6 @@
         <xsd:sequence />
       </xsd:complexType>
       <xsd:element name="AuthenticationConfiguration" nillable="true" type="tns:AuthenticationConfiguration" />
-      <xsd:complexType name="ClientCertificateConfiguration">
-        <xsd:complexContent mixed="false">
-          <xsd:extension base="tns:AuthenticationConfiguration">
-            <xsd:sequence />
-          </xsd:extension>
-        </xsd:complexContent>
-      </xsd:complexType>
-      <xsd:element name="ClientCertificateConfiguration" nillable="true" type="tns:ClientCertificateConfiguration" />
       <xsd:complexType name="OAuthWebServerConsumerConfiguration">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:AuthenticationConfiguration">
@@ -218,6 +210,14 @@
         </xsd:complexContent>
       </xsd:complexType>
       <xsd:element name="OAuthWebServerConsumerConfiguration" nillable="true" type="tns:OAuthWebServerConsumerConfiguration" />
+      <xsd:complexType name="ClientCertificateConfiguration">
+        <xsd:complexContent mixed="false">
+          <xsd:extension base="tns:AuthenticationConfiguration">
+            <xsd:sequence />
+          </xsd:extension>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:element name="ClientCertificateConfiguration" nillable="true" type="tns:ClientCertificateConfiguration" />
       <xsd:complexType name="NotificationEndpointConfiguration">
         <xsd:sequence>
           <xsd:element minOccurs="0" name="EndpointAddress" nillable="true" type="xsd:string">
@@ -771,52 +771,6 @@
         </xsd:sequence>
       </xsd:complexType>
       <xsd:element name="PaymentInstrumentMasked" nillable="true" type="tns:PaymentInstrumentMasked" />
-      <xsd:complexType name="BankAccountMasked">
-        <xsd:complexContent mixed="false">
-          <xsd:extension base="tns:PaymentInstrumentMasked">
-            <xsd:sequence>
-              <xsd:element minOccurs="0" name="AccountHoldersName" nillable="true" type="xsd:string">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="BankAccountNumberLast4Digits" nillable="true" type="xsd:string">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="BankAccountType" type="tns:BankAccountType" />
-              <xsd:element minOccurs="0" name="BankName" nillable="true" type="xsd:string">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="RoutingNumber" nillable="true" type="xsd:string">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-            </xsd:sequence>
-          </xsd:extension>
-        </xsd:complexContent>
-      </xsd:complexType>
-      <xsd:element name="BankAccountMasked" nillable="true" type="tns:BankAccountMasked" />
-      <xsd:simpleType name="BankAccountType">
-        <xsd:restriction base="xsd:string">
-          <xsd:enumeration value="Checking" />
-          <xsd:enumeration value="BusinessChecking" />
-          <xsd:enumeration value="Savings" />
-        </xsd:restriction>
-      </xsd:simpleType>
-      <xsd:element name="BankAccountType" nillable="true" type="tns:BankAccountType" />
       <xsd:complexType name="CreditCardMasked">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:PaymentInstrumentMasked">
@@ -951,6 +905,52 @@
         </xsd:restriction>
       </xsd:simpleType>
       <xsd:element name="CreditCardType" nillable="true" type="tns:CreditCardType" />
+      <xsd:complexType name="BankAccountMasked">
+        <xsd:complexContent mixed="false">
+          <xsd:extension base="tns:PaymentInstrumentMasked">
+            <xsd:sequence>
+              <xsd:element minOccurs="0" name="AccountHoldersName" nillable="true" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="BankAccountNumberLast4Digits" nillable="true" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="BankAccountType" type="tns:BankAccountType" />
+              <xsd:element minOccurs="0" name="BankName" nillable="true" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="RoutingNumber" nillable="true" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:extension>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:element name="BankAccountMasked" nillable="true" type="tns:BankAccountMasked" />
+      <xsd:simpleType name="BankAccountType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Checking" />
+          <xsd:enumeration value="BusinessChecking" />
+          <xsd:enumeration value="Savings" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:element name="BankAccountType" nillable="true" type="tns:BankAccountType" />
       <xsd:complexType name="TaxEvent">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:BillableEvent">
