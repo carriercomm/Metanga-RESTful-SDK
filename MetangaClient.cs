@@ -340,10 +340,11 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     }
 
     /// <summary>
-    /// Create a entities to database and return EntitiesId. If error occurred, MetangaException should be raised
+    /// <para><strong><font color="green">Please note, this is only beta-version of functionality. You should use it for testing purposes.</font></strong></para>
+    /// By using this method, you are able to create a number of different entities in Metanga in one bulk operation.
     /// </summary>
-    /// <param name="newEntities">Metanga entities to create</param>
-    /// <returns>Metanga ID collection of newely created entities</returns>
+    /// <param name="newEntities">The collection of entities to be created.</param>
+    /// <returns>Collection of guids of the created Entities.</returns>
     public IEnumerable<Guid> CreateEntityBulk(IEnumerable<Entity> newEntities)
     {
       var enrollmentAddress = new Uri(ServiceAddress, RestServiceBulk);
@@ -364,6 +365,26 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
           }
         }
         return entitiesGuids;
+      }
+    }
+
+    /// <summary>
+    /// <para><strong><font color="green">Please note, this is only beta-version of functionality. You should use it for testing purposes.</font></strong></para>
+    /// By using this method, you are able to update a number of different entities in Metanga in one bulk operation.
+    /// </summary>
+    /// <param name="newEntities">The collection of entities to be updated.</param>
+    public void UpdateEntityBulk(IEnumerable<Entity> newEntities)
+    {
+      var enrollmentAddress = new Uri(ServiceAddress, RestServiceBulk);
+      using (var credentialStream = new MemoryStream())
+      {
+        var enrollParamsContent = SerializeObjectToJsonContent(newEntities, credentialStream);
+        using (var httpClient = new HttpClient())
+        {
+          PopulateSessionHeader(httpClient, null);
+          var response = httpClient.PutAsync(enrollmentAddress, enrollParamsContent).Result;
+          CheckResponse(response, HttpStatusCode.OK);
+        }
       }
     }
 
@@ -432,12 +453,13 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     {
       return RetrieveEntity<T>(TypeOfIdExternal, externalId);
     }
-    
+
     /// <summary>
-    /// Retrieve entities from database. If error occurred,  MetangaException should be raised
+    /// <para><strong><font color="green">Please note, this is only beta-version of functionality. You should use it for testing purposes.</font></strong></para>
+    /// By using this method, you are able to retrieve all the entities of a certain type in one bulk operetion.
     /// </summary>
-    /// <typeparam name="T">Type of Metanga entity </typeparam>
-    /// <returns>Metanga entity</returns>
+    /// <typeparam name="T">Entity type.</typeparam>
+    /// <returns>Collection of entities of a certain type.</returns>
     public IEnumerable<T> RetrieveEntitiesBulk<T>() where T : Entity, new()
     {
       var serviceUri = CombineUri(RestServiceBulk.ToString(), typeof(T).Name);
