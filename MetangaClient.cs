@@ -389,6 +389,26 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     }
 
     /// <summary>
+    /// <para><strong><font color="green">Please note, this is only beta-version of functionality. You should use it for testing purposes.</font></strong></para>
+    /// By using this method, you are able to delete a number of different entities in Metanga in one bulk operation.
+    /// </summary>
+    /// <param name="deletedEntities">The collection of entities to be updated.</param>
+    public void DeleteEntityBulk(IEnumerable<Entity> deletedEntities)
+    {
+      var serviceUri = new Uri(ServiceAddress, RestServiceBulk);
+      var requestMessage = new HttpRequestMessage(HttpMethod.Delete, serviceUri);
+      using (var httpClient = new HttpClient())
+      using (var entityStream = new MemoryStream())
+      {
+        PopulateSessionHeader(httpClient, null);
+        var entityContent = SerializeObjectToJsonContent(deletedEntities, entityStream);
+        requestMessage.Content = entityContent;
+        using (var response = httpClient.SendAsync(requestMessage).Result)
+          CheckResponse(response, HttpStatusCode.OK);
+      }
+    }
+    
+    /// <summary>
     /// Create an entity to database and return EntityId. If error occurred, MetangaException should be raised
     /// </summary>
     /// <param name="entity">Metanga entity to create</param>
