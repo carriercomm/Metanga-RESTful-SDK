@@ -396,7 +396,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     public void DeleteEntityBulk(IEnumerable<Entity> deletedEntities)
     {
       var serviceUri = new Uri(ServiceAddress, RestServiceBulk);
-      var requestMessage = new HttpRequestMessage(HttpMethod.Delete, serviceUri);
+      using(var requestMessage = new HttpRequestMessage(HttpMethod.Delete, serviceUri))
       using (var httpClient = new HttpClient())
       using (var entityStream = new MemoryStream())
       {
