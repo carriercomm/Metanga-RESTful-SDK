@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Globalization;
 using System.Net.Http;
@@ -27,11 +28,13 @@ namespace Metanga.Example
         return;
       }
 
-      Console.WriteLine("Running Product Creation Example...");
+      Console.WriteLine("Running Bulk Product Creation Example...");
       var externalProductId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
-      var product = CreateProduct(externalProductId);
-      var productId = CreateEntityExample(client, product);
-      if (productId == null)
+      var reservationProduct = CreateReservationProduct(externalProductId + "-A");
+      var usageProduct = CreateUsageProduct(externalProductId + "-B");
+      var products = new Collection<Product> {reservationProduct, usageProduct};
+      var productIds = CreateEntityBulkExample(client, products);
+      if (productIds == null)
       {
         EndExample();
         return;
@@ -147,7 +150,21 @@ namespace Metanga.Example
       }
       catch (MetangaException e)
       {
-        Console.WriteLine("An error has occurred during enrollment: Id={0}, Message={1}", e.ErrorId, e.Message);
+        Console.WriteLine("An error has occurred during entity creation: Id={0}, Message={1}", e.ErrorId, e.Message);
+      }
+      return entityId;
+    }
+
+    private static IEnumerable<Guid> CreateEntityBulkExample(MetangaClient client, IEnumerable<Entity> entities)
+    {
+      IEnumerable<Guid> entityId = null;
+      try
+      {
+        entityId = client.CreateEntityBulk(entities);
+      }
+      catch (MetangaException e)
+      {
+        Console.WriteLine("An error has occurred during entity creation: Id={0}, Message={1}", e.ErrorId, e.Message);
       }
       return entityId;
     }
@@ -177,14 +194,14 @@ namespace Metanga.Example
                                          account.Zip, account.State);
     }
 
-    private static SampleProduct CreateProduct(string externalProductId)
+    private static SampleProduct CreateReservationProduct(string externalProductId)
     {
       // Create a Reservation Product for Cloud Storage. You can buy online storage at a price of $0.10 / Gigabyte / Month
       return new SampleProduct
                {
                  ExternalId = externalProductId,
                  Name = new Dictionary<string, string> { { "en-us", externalProductId } },
-                 PriceSchedule = CreatePriceSchedule(0.10m),
+                 PriceSchedule = CreatePriceSchedule(0.10m, "GIBBY", "MO"),
                  Taxable = true,
                  // A time-based product will automatically prorate charges based on start and end date
                  TimeBased = true,
@@ -193,16 +210,40 @@ namespace Metanga.Example
                };
     }
 
+    private static SampleProduct CreateUsageProduct(string externalProductId)
+    {
+      // Create a Usage Product for Cloud Storage. You pay $0.01 for each I/O operation.
+      return new SampleProduct
+      {
+        ExternalId = externalProductId,
+        Name = new Dictionary<string, string> { { "en-us", externalProductId } },
+        PriceSchedule = CreatePriceSchedule(0.10m, "1", null),
+        Taxable = true,
+        // A time-based product will automatically prorate charges based on start and end date
+        TimeBased = false,
+        // A null unit group means that the product does not require a unit
+        // Billable events should use a unit of "1", which represents "Each"
+        UnitGroup = null
+      };
+    }
+
     private static SamplePackage CreatePackage(string externalPackageId, string externalProductId)
     {
       // Create a Package to bill for Cloud Storage. This is a special package with a discounted price of $0.09 / Gigabyte / Month
 
-      var packageProduct = new PackageProduct
+      var reservationPackageProduct = new PackageProduct
                              {
                                EventModel = EventModel.Recurring,
-                               Product = new Product { ExternalId = externalProductId },
-                               PriceSchedule = CreatePriceSchedule(0.09m)
+                               Product = new Product { ExternalId = externalProductId + "-A" },
+                               PriceSchedule = CreatePriceSchedule(0.09m, "GIBBY", "MO")
                              };
+
+      var usagePackageProduct = new PackageProduct
+      {
+        EventModel = EventModel.None,
+        Product = new Product { ExternalId = externalProductId + "-B" },
+        PriceSchedule = CreatePriceSchedule(0.005m, "1", null)
+      };
 
       return new SamplePackage
       {
@@ -210,7 +251,7 @@ namespace Metanga.Example
         Name = new Dictionary<string, string> { { "en-us", externalPackageId } },
         AdvanceRecurringEvents = true,
         RecurringChargeCycle = new [] { "MO" },
-        PackageProducts = new [] { packageProduct }
+        PackageProducts = new [] { reservationPackageProduct, usagePackageProduct }
       };
     }
 
@@ -218,13 +259,15 @@ namespace Metanga.Example
     /// Creates a simple Price Schedule for the Cloud Storage product
     /// </summary>
     /// <param name="price">The US$ price to charge for each Gigabyte / Month of use</param>
+    /// <param name="usageUnitId">The usage unit for the given price</param>
+    /// <param name="timeUnitId">The time unit for the given price</param>
     /// <returns>A price schedule object that can be associated in a product, package, or subscription</returns>
-    private static PriceSchedule CreatePriceSchedule(Decimal price)
+    private static PriceSchedule CreatePriceSchedule(Decimal price, string usageUnitId, string timeUnitId)
     {
       var unitPrice = new UnitPrice
                         {
-                          UsageUnitId = "GIBBY",
-                          TimeUnitId = "MO",
+                          UsageUnitId = usageUnitId,
+                          TimeUnitId = timeUnitId,
                           Price = new Dictionary<string, Decimal> {{"USD", price}}
                         };
       var interval = new PriceScheduleInterval
@@ -284,15 +327,21 @@ namespace Metanga.Example
       var enrollmentDate = new DateTime(today.Year, today.Month, 1);
 
       // Assemble the subscription object
-      var subscriptionPackageProduct = new SubscriptionPackageProduct
+      var reservationSubscriptionPackageProduct = new SubscriptionPackageProduct
       {
-        Product = new Product { ExternalId = externalProductId },
+        Product = new Product { ExternalId = externalProductId + "-A" },
         Quantity = quantity,
         UnitId = unit,
         StartDate = enrollmentDate
       };
 
-      var subscriptionPackageProducts = new[] { subscriptionPackageProduct };
+      var usageSubscriptionPackageProduct = new SubscriptionPackageProduct
+      {
+        Product = new Product { ExternalId = externalProductId + "-B" },
+        StartDate = enrollmentDate
+      };
+
+      var subscriptionPackageProducts = new[] { reservationSubscriptionPackageProduct, usageSubscriptionPackageProduct };
 
       return new SampleSubscription
       {
