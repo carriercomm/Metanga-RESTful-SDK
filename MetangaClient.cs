@@ -57,9 +57,9 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
 
     #region Private static methods
 
-    private static void CheckResponse(HttpResponseMessage response, HttpStatusCode expectedStatusCode)
+    private static void CheckResponse(HttpResponseMessage response)
     {
-      if (response.IsSuccessStatusCode && response.StatusCode == expectedStatusCode)
+      if (response.IsSuccessStatusCode && response.StatusCode == HttpStatusCode.OK)
         return;
       GenerateExceptionFromResponse(response);
     }
@@ -237,7 +237,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
           httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
           httpClient.DefaultRequestHeaders.Add("X-Metanga-InvoiceAction", invoiceAction.ToString());
           var response = httpClient.PostAsync(enrollmentAddress, enrollParamsContent).Result;
-          CheckResponse(response, HttpStatusCode.Created);
+          CheckResponse(response);
           var responseContent = response.Content.ReadAsStreamAsync();
           using (var streamReader = new StreamReader(responseContent.Result, Encoding))
           {
@@ -268,7 +268,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
           httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
           httpClient.DefaultRequestHeaders.Add("X-Metanga-InvoiceAction", invoiceAction.ToString());
           var response = httpClient.PostAsync(subscribeAddress, subscriptionSerialized).Result;
-          CheckResponse(response, HttpStatusCode.Created);
+          CheckResponse(response);
           var responseContent = response.Content.ReadAsStreamAsync();
           using (var streamReader = new StreamReader(responseContent.Result, Encoding))
           {
@@ -316,7 +316,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
           httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
           httpClient.DefaultRequestHeaders.Add("X-Metanga-InvoiceAction", invoiceAction.ToString());
           var response = httpClient.PutAsync(subscribeAddress, subscriptionSerialized).Result;
-          CheckResponse(response, HttpStatusCode.Created);
+          CheckResponse(response);
           var responseContent = response.Content.ReadAsStreamAsync();
           using (var streamReader = new StreamReader(responseContent.Result, Encoding))
           {
@@ -356,7 +356,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         {
           PopulateSessionHeader(httpClient, null);
           var response = httpClient.PostAsync(enrollmentAddress, enrollParamsContent).Result;
-          CheckResponse(response, HttpStatusCode.Created);
+          CheckResponse(response);
           var responseContent = response.Content.ReadAsStreamAsync();
           using (var streamReader = new StreamReader(responseContent.Result, Encoding))
           {
@@ -383,7 +383,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         {
           PopulateSessionHeader(httpClient, null);
           var response = httpClient.PutAsync(enrollmentAddress, enrollParamsContent).Result;
-          CheckResponse(response, HttpStatusCode.OK);
+          CheckResponse(response);
         }
       }
     }
@@ -404,7 +404,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         var entityContent = SerializeObjectToJsonContent(deletedEntities, entityStream);
         requestMessage.Content = entityContent;
         using (var response = httpClient.SendAsync(requestMessage).Result)
-          CheckResponse(response, HttpStatusCode.OK);
+          CheckResponse(response);
       }
     }
     
@@ -419,7 +419,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         throw new ArgumentNullException("entity");
       using (var response = ProcessEntity(entity, (httpClient, serviceUri, messageContent) => httpClient.PostAsync(serviceUri, messageContent)))
       {
-        CheckResponse(response, HttpStatusCode.Created);
+        CheckResponse(response);
         return GetEntityIdFromResponse(response);
       }
     }
@@ -431,7 +431,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     public void UpdateEntity(Entity entity)
     {
       using (var response = ProcessEntity(entity, (httpClient, serviceUri, messageContent) => httpClient.PutAsync(serviceUri, messageContent)))
-        CheckResponse(response, HttpStatusCode.OK);
+        CheckResponse(response);
     }
     
     /// <summary>
@@ -448,7 +448,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         PopulateSessionHeader(httpClient, entityIdentificator.Value);
         var serviceUri = CombineUri(entity.GetType().Name, entityIdentificator.Key);
         using (var response = httpClient.DeleteAsync(serviceUri).Result)
-          CheckResponse(response, HttpStatusCode.OK);
+          CheckResponse(response);
       }
     }
     
@@ -490,7 +490,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         using (var result = httpClient.GetAsync(serviceUri))
         {
           var response = result.Result;
-          CheckResponse(response, HttpStatusCode.OK);
+          CheckResponse(response);
           using (var streamReader = new StreamReader(response.Content.ReadAsStreamAsync().Result, Encoding))
           {
             var jsonTextReader = new JsonTextReader(streamReader);
@@ -534,7 +534,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         using (var httpClient = new HttpClient())
         {
           var response = httpClient.PostAsync(sessionAddress, credentialsContent).Result;
-          CheckResponse(response, HttpStatusCode.Created);
+          CheckResponse(response);
           var responseContent = response.Content.ReadAsStreamAsync();
           using (var streamReader = new StreamReader(responseContent.Result, Encoding))
           {
@@ -583,7 +583,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         using (var result = httpClient.GetAsync(serviceUri))
         {
           var response = result.Result;
-          CheckResponse(response, HttpStatusCode.OK);
+          CheckResponse(response);
           using (var streamReader = new StreamReader(response.Content.ReadAsStreamAsync().Result, Encoding))
           {
             var jsonTextReader = new JsonTextReader(streamReader);
