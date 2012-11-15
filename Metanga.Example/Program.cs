@@ -20,7 +20,7 @@ namespace Metanga.Example
     /// </summary>
     private static void Main()
     {
-      Console.WriteLine("Opening connection to Metanga...");
+      PrintConsoleMessage("Opening connection to Metanga...");
       var client = OpenMetangaClient();
       if (client == null)
       {
@@ -28,11 +28,22 @@ namespace Metanga.Example
         return;
       }
 
-      Console.WriteLine("Running Bulk Product Creation Example...");
+      PrintConsoleMessage("Running Bulk Product Creation Example...");
       var externalProductId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
-      var reservationProduct = CreateReservationProduct(externalProductId + "-A");
-      var usageProduct = CreateUsageProduct(externalProductId + "-B");
-      var products = new Collection<Product> {reservationProduct, usageProduct};
+      PrintConsoleMessage(String.Format("Products ExternalId will start with {0}", externalProductId));
+      var products = new Collection<Product>();
+      for (var i = 0; i < 10; i++)
+      {
+        // Creates a few Products with an external id that looks like this: 634885826154527969-140-A
+        // The first section represents a value for this executation of the program. Will be the same for all products in this group.
+        // The second section is an incremental counter for each iteration of this loop
+        // The last section represents the type of product. "A" is a Reservation product. "B" is a Usage product.
+        var suffix = i.ToString("00", CultureInfo.InvariantCulture);
+        var reservationProduct = CreateReservationProduct(externalProductId + "-" + suffix + "-A");
+        var usageProduct = CreateUsageProduct(externalProductId + "-" + suffix + "-B");
+        products.Add(reservationProduct);
+        products.Add(usageProduct);
+      }
       var productIds = CreateEntityBulkExample(client, products);
       if (productIds == null)
       {
@@ -40,9 +51,9 @@ namespace Metanga.Example
         return;
       }
 
-      Console.WriteLine("Running Package Creation Example...");
+      PrintConsoleMessage("Running Package Creation Example...");
       var externalPackageId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
-      var package = CreatePackage(externalPackageId, externalProductId);
+      var package = CreatePackage(externalPackageId, externalProductId + "-00"); // the "00" is to use the first pair of products created
       var packageId = CreateEntityExample(client, package);
       if (packageId == null)
       {
@@ -50,18 +61,23 @@ namespace Metanga.Example
         return;
       }
 
-      Console.WriteLine("Running Enrollment Example...");
-      var subscription = EnrollmentExample(client, externalPackageId, externalProductId);
+      PrintConsoleMessage("Running Enrollment Example...");
+      var subscription = EnrollmentExample(client, externalPackageId, externalProductId + "-00");
 
       if (subscription != null)
       {
-        Console.WriteLine("Running ModifySubscription Example...");
+        PrintConsoleMessage("Running ModifySubscription Example...");
         ModifySubscriptionExample(client, subscription);
       }
 
-      Console.WriteLine("Closing connection to Metanga...");
+      PrintConsoleMessage("Closing connection to Metanga...");
       CloseMetangaClient(client);
       EndExample();
+    }
+
+    private static void PrintConsoleMessage(string message)
+    {
+      Console.WriteLine("{0}: {1}", DateTime.Now.ToString("s", CultureInfo.InvariantCulture), message);
     }
 
     /// <summary>
@@ -95,13 +111,13 @@ namespace Metanga.Example
       }
       catch (MetangaException e)
       {
-        Console.WriteLine("An error has occurred during enrollment: Id={0}, Message={1}", e.ErrorId, e.Message);
+        PrintConsoleMessage(String.Format("An error has occurred during enrollment: Id={0}, Message={1}", e.ErrorId, e.Message));
         enrollmentSucceeded = false;
       }
 
       if (!enrollmentSucceeded) return null;
 
-      Console.WriteLine("Account has been successfully enrolled. Account Id: {0}", externalAccountId);
+      PrintConsoleMessage(String.Format("Account has been successfully enrolled. Account Id: {0}", externalAccountId));
       if (invoice != null) DisplayInvoiceDetails(client, invoice);
 
       return subscription;
@@ -121,23 +137,23 @@ namespace Metanga.Example
       }
       catch (MetangaException e)
       {
-        Console.WriteLine("An error has occurred during subscription modification: Id={0}, Message={1}", e.ErrorId, e.Message);
+        PrintConsoleMessage((String.Format("An error has occurred during subscription modification: Id={0}, Message={1}", e.ErrorId, e.Message)));
         return;
       }
 
-      Console.WriteLine("Subscription has been successfully modified.");
+      PrintConsoleMessage("Subscription has been successfully modified.");
       if (invoice != null) DisplayInvoiceDetails(client, invoice);
     }
 
     private static void DisplayInvoiceDetails(MetangaClient client, Invoice invoice)
     {
-      Console.WriteLine("An invoice has been created for {0} {1}", invoice.InvoiceCurrency,
-                        invoice.InvoiceSalesAmount + invoice.InvoiceTaxAmount);
+      PrintConsoleMessage(String.Format("An invoice has been created for {0} {1}", invoice.InvoiceCurrency,
+                                        invoice.InvoiceSalesAmount + invoice.InvoiceTaxAmount));
       foreach (var charge in invoice.Charges)
       {
         if (!charge.Product.EntityId.HasValue) throw new InvalidOperationException("Product in Charge element has no EntityId"); // should not happen!
         var product = client.RetrieveEntity<Product>(charge.Product.EntityId.Value);
-        Console.WriteLine("  - {0}: {1} {2} (Qty={3} {4} - {5})", product.Name["en-us"], invoice.InvoiceCurrency, charge.ChargeAmount, charge.Quantity, charge.StartTime.ToShortDateString(), charge.EndTime.ToShortDateString());
+        PrintConsoleMessage(String.Format("  - {0}: {1} {2} (Qty={3} {4} - {5})", product.Name["en-us"], invoice.InvoiceCurrency, charge.ChargeAmount, charge.Quantity, charge.StartTime.ToShortDateString(), charge.EndTime.ToShortDateString()));
       }
     }
 
@@ -150,7 +166,7 @@ namespace Metanga.Example
       }
       catch (MetangaException e)
       {
-        Console.WriteLine("An error has occurred during entity creation: Id={0}, Message={1}", e.ErrorId, e.Message);
+        PrintConsoleMessage(String.Format("An error has occurred during entity creation: Id={0}, Message={1}", e.ErrorId, e.Message));
       }
       return entityId;
     }
@@ -164,7 +180,7 @@ namespace Metanga.Example
       }
       catch (MetangaException e)
       {
-        Console.WriteLine("An error has occurred during entity creation: Id={0}, Message={1}", e.ErrorId, e.Message);
+        PrintConsoleMessage(String.Format("An error has occurred during entity creation: Id={0}, Message={1}", e.ErrorId, e.Message));
       }
       return entityId;
     }
@@ -371,7 +387,7 @@ namespace Metanga.Example
       }
       catch (MetangaException e)
       {
-        Console.WriteLine("An error has occurred while connecting to Metanga: Id={0}, Message={1}", e.ErrorId, e.Message);
+        PrintConsoleMessage(String.Format("An error has occurred while connecting to Metanga: Id={0}, Message={1}", e.ErrorId, e.Message));
         return null;
       }
       return client;
@@ -390,8 +406,7 @@ namespace Metanga.Example
       }
       catch (MetangaException e)
       {
-        Console.WriteLine("An error has occurred while closing connection to Metanga: Id={0}, Message={1}", e.ErrorId,
-                          e.Message);
+        PrintConsoleMessage(String.Format("An error has occurred while closing connection to Metanga: Id={0}, Message={1}", e.ErrorId, e.Message));
       }
     }
 
@@ -401,7 +416,7 @@ namespace Metanga.Example
     /// </summary>
     private static void EndExample()
     {
-      Console.WriteLine("Press any key to finish");
+      PrintConsoleMessage("Press any key to finish");
       Console.ReadKey();
     }
   }
