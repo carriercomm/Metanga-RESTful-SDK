@@ -75,6 +75,9 @@
     <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.Account.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.ElectronicPayment.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.Entity.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>

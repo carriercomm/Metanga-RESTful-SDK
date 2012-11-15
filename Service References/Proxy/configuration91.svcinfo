@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="I1XeOTLOYNSfvSDINWp08BM4Zuo=">
+<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="R+K9QAtwjova6if1mRkm3mPuAqs=">
   <bindingConfigurations>
     <bindingConfiguration bindingType="wsHttpBinding" name="WSHttpBinding_IEnrollment">
       <properties>
@@ -127,10 +127,10 @@
     </bindingConfiguration>
   </bindingConfigurations>
   <endpoints>
-    <endpoint name="WSHttpBinding_IEnrollment" contract="Proxy.IEnrollment" bindingType="wsHttpBinding" address="https://vmbaasdev19.metratech.com/soapservice" bindingConfiguration="WSHttpBinding_IEnrollment">
+    <endpoint name="WSHttpBinding_IEnrollment" contract="Proxy.IEnrollment" bindingType="wsHttpBinding" address="https://vmbaasdev18.metratech.com/soapservice" bindingConfiguration="WSHttpBinding_IEnrollment">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>https://vmbaasdev19.metratech.com/soapservice</serializedValue>
+          <serializedValue>https://vmbaasdev18.metratech.com/soapservice</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />
