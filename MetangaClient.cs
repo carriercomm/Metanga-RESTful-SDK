@@ -25,7 +25,6 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     private static readonly Uri RestServiceSession = new Uri("RestService/session", UriKind.Relative);
     private static readonly Uri RestServiceEnrollment = new Uri("RestService/enrollment", UriKind.Relative);
     private static readonly Uri RestServiceSubscribe = new Uri("RestService/subscribe", UriKind.Relative);
-    private static readonly Uri RestServiceElectronicPayment = new Uri("RestService/electronicpayment", UriKind.Relative);
     private static readonly Uri RestServiceBulk = new Uri("RestService/bulk", UriKind.Relative);
     private const string TypeOfIdMetanga = "Metanga";
     private const string TypeOfIdExternal = "External";
@@ -339,40 +338,6 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     {
       return Modify(subscription, effectiveDate, InvoiceAction.InvoiceNext);
     }
-
-    #region Electronic Payments
-
-    /// <summary>
-    /// Process payment operation using the credit card or the bank account payment instruments.
-    /// (Submit, credit or reverse operation)
-    /// </summary>
-    /// <param name="electronicPayment">The entity, populated with data required to process the funds withdrawing operation.</param>
-    /// <param name="paymentOperation">Type of operation</param>
-    /// <returns></returns>
-    public ElectronicPayment ProcessElectronicPayment(ElectronicPayment electronicPayment, ElectronicPaymentOperation paymentOperation)
-    {
-      var electronicPaymentAddress = new Uri(ServiceAddress, RestServiceElectronicPayment);
-      using (var credentialStream = new MemoryStream())
-      {
-        var electronicPaymentParamsContent = SerializeObjectToJsonContent(electronicPayment, credentialStream);
-        ElectronicPayment returnElectronicPayment;
-        using (var httpClient = new HttpClient())
-        {
-          httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
-          httpClient.DefaultRequestHeaders.Add("X-Metanga-PaymentOperation", paymentOperation.ToString());
-          var response = httpClient.PostAsync(electronicPaymentAddress, electronicPaymentParamsContent).Result;
-          CheckResponse(response);
-          var responseContent = response.Content.ReadAsStreamAsync();
-          using (var streamReader = new StreamReader(responseContent.Result, Encoding))
-          {
-            var jsonTextReader = new JsonTextReader(streamReader);
-            returnElectronicPayment = (ElectronicPayment)JsonSerializer.Deserialize(jsonTextReader, typeof(ElectronicPayment));
-          }
-        }
-        return returnElectronicPayment;
-      }
-    }
-    #endregion
 
     /// <summary>
     /// <para><strong><font color="green">Please note, this is only beta-version of functionality. You should use it for testing purposes.</font></strong></para>
