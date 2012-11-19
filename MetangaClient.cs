@@ -361,7 +361,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
           httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
           httpClient.DefaultRequestHeaders.Add("X-Metanga-PaymentOperation", paymentOperation.ToString());
           var response = httpClient.PostAsync(electronicPaymentAddress, electronicPaymentParamsContent).Result;
-          CheckResponse(response);
+          CheckResponse(response, HttpStatusCode.Created);
           var responseContent = response.Content.ReadAsStreamAsync();
           using (var streamReader = new StreamReader(responseContent.Result, Encoding))
           {
