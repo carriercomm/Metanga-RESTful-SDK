@@ -347,9 +347,8 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     /// (Submit, credit or reverse operation)
     /// </summary>
     /// <param name="electronicPayment">The entity, populated with data required to process the funds withdrawing operation.</param>
-    /// <param name="paymentOperation">Type of operation</param>
     /// <returns></returns>
-    public ElectronicPayment ProcessElectronicPayment(ElectronicPayment electronicPayment, ElectronicPaymentOperation paymentOperation)
+    public ElectronicPayment ProcessElectronicPayment(ElectronicPayment electronicPayment)
     {
       var electronicPaymentAddress = new Uri(ServiceAddress, RestServiceElectronicPayment);
       using (var credentialStream = new MemoryStream())
@@ -359,7 +358,6 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         using (var httpClient = new HttpClient())
         {
           httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
-          httpClient.DefaultRequestHeaders.Add("X-Metanga-PaymentOperation", paymentOperation.ToString());
           var response = httpClient.PostAsync(electronicPaymentAddress, electronicPaymentParamsContent).Result;
           CheckResponse(response, HttpStatusCode.Created);
           var responseContent = response.Content.ReadAsStreamAsync();
