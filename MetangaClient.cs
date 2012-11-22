@@ -25,6 +25,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     private static readonly Uri RestServiceSession = new Uri("RestService/session", UriKind.Relative);
     private static readonly Uri RestServiceEnrollment = new Uri("RestService/enrollment", UriKind.Relative);
     private static readonly Uri RestServiceSubscribe = new Uri("RestService/subscribe", UriKind.Relative);
+    private static readonly Uri RestServiceMeterUsageEvents = new Uri("RestService/meterusageevents", UriKind.Relative);
     private static readonly Uri RestServiceElectronicPayment = new Uri("RestService/electronicpayment", UriKind.Relative);
     private static readonly Uri RestServiceBulk = new Uri("RestService/bulk", UriKind.Relative);
     private const string TypeOfIdMetanga = "Metanga";
@@ -338,6 +339,28 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     public Invoice Modify(Subscription subscription, DateTime? effectiveDate)
     {
       return Modify(subscription, effectiveDate, InvoiceAction.InvoiceNext);
+    }
+
+    /// <summary>
+    /// Submit usage events to be rated and charged by Metanga.
+    /// A maximum of 1000 events can be submitted at a time
+    /// </summary>
+    /// <param name="batch">The batch information for this group of events</param>
+    /// <param name="billableEvents">Collection of events to be rated</param>
+    public void MeterUsageEvents(UsageBatch batch, IEnumerable<BillableEvent> billableEvents)
+    {
+      var meterUsageAddress = new Uri(ServiceAddress, RestServiceMeterUsageEvents);
+      var meterParams = new { Batch = batch, BillableEvents = billableEvents };
+      using (var credentialStream = new MemoryStream())
+      {
+        var meterParamsContent = SerializeObjectToJsonContent(meterParams, credentialStream);
+        using (var httpClient = new HttpClient())
+        {
+          httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
+          var response = httpClient.PostAsync(meterUsageAddress, meterParamsContent).Result;
+          CheckResponse(response, HttpStatusCode.Created);
+        }
+      }
     }
 
     #region Electronic Payments
