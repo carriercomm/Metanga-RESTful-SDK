@@ -68,6 +68,24 @@ namespace Metanga.Example
       {
         PrintConsoleMessage("Running ModifySubscription Example...");
         ModifySubscriptionExample(client, subscription);
+
+        PrintConsoleMessage("Meter Billable Events Example...");
+        var billableEvent = new UsageEvent
+        {
+          Originator = new Account { ExternalId = subscription.Account.ExternalId },
+          Product = new Product { ExternalId = externalProductId + "-00-B"}, // the "B" represents the usage product
+          Quantity = 1000m,
+          UnitOfMeasure = "1",
+          StartTime = DateTime.Now
+        };
+
+        var batch = new UsageBatch
+                      {
+                        BatchId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture),
+                        BatchNamespace = "Metanga SDK",
+                        BatchType = "Storage I/O"
+                      };
+        client.MeterUsageEvents(batch, new Collection<BillableEvent> { billableEvent });
       }
 
       PrintConsoleMessage("Closing connection to Metanga...");

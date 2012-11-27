@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Metanga.SoftwareDevelopmentKit.Proxy;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -25,6 +28,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     private static readonly Uri RestServiceSession = new Uri("RestService/session", UriKind.Relative);
     private static readonly Uri RestServiceEnrollment = new Uri("RestService/enrollment", UriKind.Relative);
     private static readonly Uri RestServiceSubscribe = new Uri("RestService/subscribe", UriKind.Relative);
+    private static readonly Uri RestServiceMeterUsageEvents = new Uri("RestService/meterusageevents", UriKind.Relative);
     private static readonly Uri RestServiceElectronicPayment = new Uri("RestService/electronicpayment", UriKind.Relative);
     private static readonly Uri RestServiceBulk = new Uri("RestService/bulk", UriKind.Relative);
     private const string TypeOfIdMetanga = "Metanga";
@@ -53,7 +57,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
 
     private static readonly Encoding Encoding = new UTF8Encoding(false, true);
     private static readonly JsonSerializer JsonSerializer = CreateJsonSerializer();
-
+    private readonly MediaTypeWithQualityHeaderValue _contentFormatHeader;
     #endregion
 
     #region Private static methods
@@ -77,19 +81,6 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         var errorId = Guid.Parse(errorJsonObject.ErrorId.ToString());
         var errorMessage = errorJsonObject.ErrorMessage.ToString();
         throw new MetangaException(errorMessage, errorId);
-      }
-    }
-
-    private static Guid GetEntityIdFromResponse(HttpResponseMessage httpResponseMessage)
-    {
-      if (httpResponseMessage == null)
-        throw new ArgumentNullException("httpResponseMessage");
-      using (var streamReader = new StreamReader(httpResponseMessage.Content.ReadAsStreamAsync().Result, Encoding))
-      {
-        var jsonTextReader = new JsonTextReader(streamReader);
-        var jsonObject = JToken.Load(jsonTextReader);
-        var entityId = jsonObject.ToString();
-        return Guid.Parse(entityId);
       }
     }
 
@@ -120,28 +111,40 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       return jsonContent;
     }
 
-    private static StreamContent SerializeObjectToJsonContent(object entity, Stream entityStream)
+    private  StreamContent SerializeContent(object entity, Stream entityStream)
     {
       if (entityStream == null) throw new ArgumentNullException("entityStream");
-      var jsonTextWriter = new JsonTextWriter(new StreamWriter(entityStream, Encoding)) {CloseOutput = false};
-      JsonSerializer.Serialize(jsonTextWriter, entity);
-      jsonTextWriter.Flush();
+
+      switch (ContentType)
+      {
+        case MetangaContentType.Json:
+          SerializeToJson(entity, entityStream);
+          break;
+        case MetangaContentType.Xml:
+          SerializeToXml(entity, entityStream);
+          break;
+        default:
+          throw new NotSupportedException();
+      }
+
       entityStream.Seek(0, SeekOrigin.Begin);
       var streamContent = new StreamContent(entityStream);
-      streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+      streamContent.Headers.ContentType = _contentFormatHeader;
+
       return streamContent;
     }
 
-    private static StreamContent SerializeToJsonContent(Entity entity, Stream entityStream)
+    private static void SerializeToJson (object entity, Stream entityStream)
     {
-      if (entityStream == null) throw new ArgumentNullException("entityStream");
-      var jsonTextWriter = new JsonTextWriter(new StreamWriter(entityStream, Encoding)) {CloseOutput = false};
+      var jsonTextWriter = new JsonTextWriter(new StreamWriter(entityStream, Encoding)) { CloseOutput = false };
       JsonSerializer.Serialize(jsonTextWriter, entity);
       jsonTextWriter.Flush();
-      entityStream.Seek(0, SeekOrigin.Begin);
-      var streamContent = new StreamContent(entityStream);
-      streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-      return streamContent;
+    }
+
+    private static void SerializeToXml(object entity, Stream entityStream)
+    {
+      var serializer = new DataContractSerializer(typeof(object));
+      serializer.WriteObject(entityStream, entity);
     }
 
     private static KeyValuePair<string, string> GetEntityIdentificator(Entity entity)
@@ -157,9 +160,6 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
 
     private MetangaClient(Uri address, string userName, string password, MetangaContentType contentType)
     {
-      if (contentType != MetangaContentType.Json)
-        throw new NotImplementedException("Processing of data in the format of XML has not been implemented yet.");
-
       if (address == null)
         throw new ArgumentNullException("address");
       if (string.IsNullOrEmpty(userName))
@@ -171,6 +171,21 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       UserName = userName;
       Password = password;
       ContentType = contentType;
+
+      string contentFormat;
+      switch (ContentType)
+      {
+        case MetangaContentType.Json:
+          contentFormat = "application/json";
+          break;
+        case MetangaContentType.Xml:
+          contentFormat = "application/xml";
+          break;
+        default:
+          throw new NotSupportedException();
+      }
+      _contentFormatHeader = new MediaTypeWithQualityHeaderValue(contentFormat);
+
       SessionId = CreateSession();
     }
 
@@ -212,7 +227,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     /// <summary>
     /// REST content type (JSON, XML)
     /// </summary>
-    private MetangaContentType ContentType { get; set; }
+    private  MetangaContentType ContentType { get; set; }
 
     #endregion
 
@@ -231,22 +246,16 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       var enrollParams = new {Subscription = subscription, Account = account};
       using (var credentialStream = new MemoryStream())
       {
-        var enrollParamsContent = SerializeObjectToJsonContent(enrollParams, credentialStream);
-        Invoice returnInvoice;
+        var enrollParamsContent = SerializeContent(enrollParams, credentialStream);
         using (var httpClient = new HttpClient())
         {
           PopulateMetangaHeaders(httpClient, null, new Dictionary<string, string> { { "X-Metanga-InvoiceAction", invoiceAction.ToString() } });
 
           var response = httpClient.PostAsync(enrollmentAddress, enrollParamsContent).Result;
           CheckResponse(response, HttpStatusCode.Created);
-          var responseContent = response.Content.ReadAsStreamAsync();
-          using (var streamReader = new StreamReader(responseContent.Result, Encoding))
-          {
-            var jsonTextReader = new JsonTextReader(streamReader);
-            returnInvoice = (Invoice) JsonSerializer.Deserialize(jsonTextReader, typeof (Invoice));
-          }
+          var responseContent = response.Content.ReadAsStreamAsync().Result;
+          return DeserializeContent<Invoice>(responseContent);
         }
-        return returnInvoice;
       }
     }
 
@@ -259,25 +268,18 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     public Invoice Subscribe(Subscription subscription, InvoiceAction invoiceAction)
     {
       var subscribeAddress = new Uri(ServiceAddress, RestServiceSubscribe);
-      //var subscribeParams = new { Subscription = subscription };
       using (var credentialStream = new MemoryStream())
       {
-        var subscriptionSerialized = SerializeObjectToJsonContent(subscription, credentialStream);
-        Invoice returnInvoice;
+        var subscriptionSerialized = SerializeContent(subscription, credentialStream);
         using (var httpClient = new HttpClient())
         {
           PopulateMetangaHeaders(httpClient, null, new Dictionary<string, string> { { "X-Metanga-InvoiceAction", invoiceAction.ToString() } });
 
           var response = httpClient.PostAsync(subscribeAddress, subscriptionSerialized).Result;
           CheckResponse(response, HttpStatusCode.Created);
-          var responseContent = response.Content.ReadAsStreamAsync();
-          using (var streamReader = new StreamReader(responseContent.Result, Encoding))
-          {
-            var jsonTextReader = new JsonTextReader(streamReader);
-            returnInvoice = (Invoice) JsonSerializer.Deserialize(jsonTextReader, typeof (Invoice));
-          }
+          var responseContent = response.Content.ReadAsStreamAsync().Result;
+          return DeserializeContent<Invoice>(responseContent);
         }
-        return returnInvoice;
       }
     }
 
@@ -304,8 +306,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       
       using (var credentialStream = new MemoryStream())
       {
-        var subscriptionSerialized = SerializeObjectToJsonContent(subscription, credentialStream);
-        Invoice returnInvoice;
+        var subscriptionSerialized = SerializeContent(subscription, credentialStream);
         using (var httpClient = new HttpClient())
         {
           var dictionaryHeaders = new Dictionary<string, string> {{"X-Metanga-InvoiceAction", invoiceAction.ToString()}};
@@ -319,14 +320,9 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
 
           var response = httpClient.PutAsync(subscribeAddress, subscriptionSerialized).Result;
           CheckResponse(response, HttpStatusCode.Created);
-          var responseContent = response.Content.ReadAsStreamAsync();
-          using (var streamReader = new StreamReader(responseContent.Result, Encoding))
-          {
-            var jsonTextReader = new JsonTextReader(streamReader);
-            returnInvoice = (Invoice)JsonSerializer.Deserialize(jsonTextReader, typeof(Invoice));
-          }
+          var responseContent = response.Content.ReadAsStreamAsync().Result;
+          return DeserializeContent<Invoice>(responseContent);
         }
-        return returnInvoice;
       }
     }
 
@@ -339,6 +335,28 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     public Invoice Modify(Subscription subscription, DateTime? effectiveDate)
     {
       return Modify(subscription, effectiveDate, InvoiceAction.InvoiceNext);
+    }
+
+    /// <summary>
+    /// Submit usage events to be rated and charged by Metanga.
+    /// A maximum of 1000 events can be submitted at a time
+    /// </summary>
+    /// <param name="batch">The batch information for this group of events</param>
+    /// <param name="billableEvents">Collection of events to be rated</param>
+    public void MeterUsageEvents(UsageBatch batch, IEnumerable<BillableEvent> billableEvents)
+    {
+      var meterUsageAddress = new Uri(ServiceAddress, RestServiceMeterUsageEvents);
+      var meterParams = new { Batch = batch, BillableEvents = billableEvents };
+      using (var credentialStream = new MemoryStream())
+      {
+        var meterParamsContent = SerializeContent(meterParams, credentialStream);
+        using (var httpClient = new HttpClient())
+        {
+          httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
+          var response = httpClient.PostAsync(meterUsageAddress, meterParamsContent).Result;
+          CheckResponse(response, HttpStatusCode.Created);
+        }
+      }
     }
 
     #region Electronic Payments
@@ -354,22 +372,16 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       var electronicPaymentAddress = new Uri(ServiceAddress, RestServiceElectronicPayment);
       using (var credentialStream = new MemoryStream())
       {
-        var electronicPaymentParamsContent = SerializeObjectToJsonContent(electronicPayment, credentialStream);
-        ElectronicPayment returnElectronicPayment;
+        var electronicPaymentParamsContent = SerializeContent(electronicPayment, credentialStream);
         using (var httpClient = new HttpClient())
         {
           PopulateMetangaHeaders(httpClient, null);
 
           var response = httpClient.PostAsync(electronicPaymentAddress, electronicPaymentParamsContent).Result;
           CheckResponse(response, HttpStatusCode.Created);
-          var responseContent = response.Content.ReadAsStreamAsync();
-          using (var streamReader = new StreamReader(responseContent.Result, Encoding))
-          {
-            var jsonTextReader = new JsonTextReader(streamReader);
-            returnElectronicPayment = (ElectronicPayment)JsonSerializer.Deserialize(jsonTextReader, typeof(ElectronicPayment));
-          }
+          var responseContent = response.Content.ReadAsStreamAsync().Result;
+          return DeserializeContent<ElectronicPayment>(responseContent);
         }
-        return returnElectronicPayment;
       }
     }
     #endregion
@@ -385,21 +397,15 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       var enrollmentAddress = new Uri(ServiceAddress, RestServiceBulk);
       using (var credentialStream = new MemoryStream())
       {
-        var enrollParamsContent = SerializeObjectToJsonContent(newEntities, credentialStream);
-        IEnumerable<Guid> entitiesGuids;
+        var enrollParamsContent = SerializeContent(newEntities, credentialStream);
         using (var httpClient = new HttpClient())
         {
           PopulateMetangaHeaders(httpClient, null);
           var response = httpClient.PostAsync(enrollmentAddress, enrollParamsContent).Result;
           CheckResponse(response, HttpStatusCode.Created);
-          var responseContent = response.Content.ReadAsStreamAsync();
-          using (var streamReader = new StreamReader(responseContent.Result, Encoding))
-          {
-            var jsonTextReader = new JsonTextReader(streamReader);
-            entitiesGuids = JsonSerializer.Deserialize<IEnumerable<Guid>>(jsonTextReader);
-          }
+          var responseContent = response.Content.ReadAsStreamAsync().Result;
+          return DeserializeContent<IEnumerable<Guid>>(responseContent);
         }
-        return entitiesGuids;
       }
     }
 
@@ -413,7 +419,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       var enrollmentAddress = new Uri(ServiceAddress, RestServiceBulk);
       using (var credentialStream = new MemoryStream())
       {
-        var enrollParamsContent = SerializeObjectToJsonContent(newEntities, credentialStream);
+        var enrollParamsContent = SerializeContent(newEntities, credentialStream);
         using (var httpClient = new HttpClient())
         {
           PopulateMetangaHeaders(httpClient, null);
@@ -436,7 +442,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       using (var entityStream = new MemoryStream())
       {
         PopulateMetangaHeaders(httpClient, null);
-        var entityContent = SerializeObjectToJsonContent(deletedEntities, entityStream);
+        var entityContent = SerializeContent(deletedEntities, entityStream);
         requestMessage.Content = entityContent;
         using (var response = httpClient.SendAsync(requestMessage).Result)
           CheckResponse(response, HttpStatusCode.OK);
@@ -455,7 +461,8 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       using (var response = ProcessEntity(entity, (httpClient, serviceUri, messageContent) => httpClient.PostAsync(serviceUri, messageContent)))
       {
         CheckResponse(response, HttpStatusCode.Created);
-        return GetEntityIdFromResponse(response);
+        var responseContent = response.Content.ReadAsStreamAsync().Result;
+        return DeserializeContent<Guid>(responseContent);
       }
     }
 
@@ -518,7 +525,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     public IEnumerable<T> RetrieveEntitiesBulk<T>() where T : Entity, new()
     {
       var serviceUri = CombineUri(RestServiceBulk.ToString(), typeof(T).Name);
-      IEnumerable<T> entity;
+      
       using (var httpClient = new HttpClient())
       {
         PopulateMetangaHeaders(httpClient, null);
@@ -526,14 +533,11 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         {
           var response = result.Result;
           CheckResponse(response, HttpStatusCode.OK);
-          using (var streamReader = new StreamReader(response.Content.ReadAsStreamAsync().Result, Encoding))
-          {
-            var jsonTextReader = new JsonTextReader(streamReader);
-            entity = JsonSerializer.Deserialize<IEnumerable<T>>(jsonTextReader);
-          }
+          var responseContent = response.Content.ReadAsStreamAsync().Result;
+          var baseEntities = DeserializeContent<IEnumerable<Entity>>(responseContent);
+          return baseEntities.Select(baseEntity => baseEntity as T).ToArray();
         }
       }
-      return entity;
     }
     /// <summary>
     /// Close session
@@ -590,7 +594,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
 
         using (var entityStream = new MemoryStream())
         {
-          var entityContent = SerializeToJsonContent(entity, entityStream);
+          var entityContent = SerializeContent(entity, entityStream);
           var response = method(httpClient, serviceUri, entityContent).Result;
           return response;
         }
@@ -602,16 +606,19 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
       if (!string.IsNullOrEmpty(typeId))
         httpClient.DefaultRequestHeaders.Add("X-Metanga-ReferenceType", typeId);
-      httpClient.DefaultRequestHeaders.Add("Accept", ContentType == MetangaContentType.Json ? "application/json" : "application/xml");
+      
+      //Populate Accept header
+      httpClient.DefaultRequestHeaders.Accept.Clear();
+      httpClient.DefaultRequestHeaders.Accept.Add(_contentFormatHeader);
 
       if (addCustomHeaders != null)
         foreach (var header in addCustomHeaders)
           httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
     }
+
     private T RetrieveEntity<T>(string typeOfId, string value) where T : Entity, new()
     {
       var serviceUri = CombineUri(typeof(T).Name, value);
-      T entity;
 
       using (var httpClient = new HttpClient())
       {
@@ -620,15 +627,35 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         {
           var response = result.Result;
           CheckResponse(response, HttpStatusCode.OK);
-          using (var streamReader = new StreamReader(response.Content.ReadAsStreamAsync().Result, Encoding))
-          {
-            var jsonTextReader = new JsonTextReader(streamReader);
-            entity = (T)JsonSerializer.Deserialize(jsonTextReader, typeof(T));
-          }
+          var stream = response.Content.ReadAsStreamAsync().Result;
+          return DeserializeContent<T>(stream);
         }
       }
-      return entity;
     }
+
+    private T DeserializeContent<T>(Stream stream)
+    {
+      using (var streamReader = new StreamReader(stream, Encoding))
+      {
+        switch (ContentType)
+        {
+          case MetangaContentType.Json:
+            {
+              var jsonTextReader = new JsonTextReader(streamReader);
+              return (T) JsonSerializer.Deserialize(jsonTextReader, typeof (T));
+            }
+          case MetangaContentType.Xml:
+            {
+              var serializer = new DataContractSerializer(typeof(T));
+              var xmlReader = XmlReader.Create(streamReader);
+              return (T)serializer.ReadObject(xmlReader);
+            }
+          default:
+            throw new NotSupportedException();
+        }
+      }
+    }
+
     private Uri CombineUri(params string[] segments)
     {
       const string restService = "RestService";
