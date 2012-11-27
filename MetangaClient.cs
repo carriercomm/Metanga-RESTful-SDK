@@ -235,8 +235,8 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         Invoice returnInvoice;
         using (var httpClient = new HttpClient())
         {
-          httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
-          httpClient.DefaultRequestHeaders.Add("X-Metanga-InvoiceAction", invoiceAction.ToString());
+          PopulateMetangaHeaders(httpClient, null, new Dictionary<string, string> { { "X-Metanga-InvoiceAction", invoiceAction.ToString() } });
+
           var response = httpClient.PostAsync(enrollmentAddress, enrollParamsContent).Result;
           CheckResponse(response, HttpStatusCode.Created);
           var responseContent = response.Content.ReadAsStreamAsync();
@@ -266,8 +266,8 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         Invoice returnInvoice;
         using (var httpClient = new HttpClient())
         {
-          httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
-          httpClient.DefaultRequestHeaders.Add("X-Metanga-InvoiceAction", invoiceAction.ToString());
+          PopulateMetangaHeaders(httpClient, null, new Dictionary<string, string> { { "X-Metanga-InvoiceAction", invoiceAction.ToString() } });
+
           var response = httpClient.PostAsync(subscribeAddress, subscriptionSerialized).Result;
           CheckResponse(response, HttpStatusCode.Created);
           var responseContent = response.Content.ReadAsStreamAsync();
@@ -308,14 +308,15 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         Invoice returnInvoice;
         using (var httpClient = new HttpClient())
         {
+          var dictionaryHeaders = new Dictionary<string, string> {{"X-Metanga-InvoiceAction", invoiceAction.ToString()}};
           if (effectiveDate.HasValue)
           {
             var dateInIsoFormat = effectiveDate.Value.ToString("s", CultureInfo.InvariantCulture);
-            httpClient.DefaultRequestHeaders.Add("X-Metanga-EffectiveDate", dateInIsoFormat);
+            dictionaryHeaders.Add("X-Metanga-EffectiveDate", dateInIsoFormat); 
           }
 
-          httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
-          httpClient.DefaultRequestHeaders.Add("X-Metanga-InvoiceAction", invoiceAction.ToString());
+          PopulateMetangaHeaders(httpClient, null, dictionaryHeaders);
+
           var response = httpClient.PutAsync(subscribeAddress, subscriptionSerialized).Result;
           CheckResponse(response, HttpStatusCode.Created);
           var responseContent = response.Content.ReadAsStreamAsync();
@@ -347,9 +348,8 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     /// (Submit, credit or reverse operation)
     /// </summary>
     /// <param name="electronicPayment">The entity, populated with data required to process the funds withdrawing operation.</param>
-    /// <param name="paymentOperation">Type of operation</param>
     /// <returns></returns>
-    public ElectronicPayment ProcessElectronicPayment(ElectronicPayment electronicPayment, ElectronicPaymentOperation paymentOperation)
+    public ElectronicPayment ProcessElectronicPayment(ElectronicPayment electronicPayment)
     {
       var electronicPaymentAddress = new Uri(ServiceAddress, RestServiceElectronicPayment);
       using (var credentialStream = new MemoryStream())
@@ -358,8 +358,8 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         ElectronicPayment returnElectronicPayment;
         using (var httpClient = new HttpClient())
         {
-          httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
-          httpClient.DefaultRequestHeaders.Add("X-Metanga-PaymentOperation", paymentOperation.ToString());
+          PopulateMetangaHeaders(httpClient, null);
+
           var response = httpClient.PostAsync(electronicPaymentAddress, electronicPaymentParamsContent).Result;
           CheckResponse(response, HttpStatusCode.Created);
           var responseContent = response.Content.ReadAsStreamAsync();
@@ -389,7 +389,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         IEnumerable<Guid> entitiesGuids;
         using (var httpClient = new HttpClient())
         {
-          PopulateSessionHeader(httpClient, null);
+          PopulateMetangaHeaders(httpClient, null);
           var response = httpClient.PostAsync(enrollmentAddress, enrollParamsContent).Result;
           CheckResponse(response, HttpStatusCode.Created);
           var responseContent = response.Content.ReadAsStreamAsync();
@@ -416,7 +416,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         var enrollParamsContent = SerializeObjectToJsonContent(newEntities, credentialStream);
         using (var httpClient = new HttpClient())
         {
-          PopulateSessionHeader(httpClient, null);
+          PopulateMetangaHeaders(httpClient, null);
           var response = httpClient.PutAsync(enrollmentAddress, enrollParamsContent).Result;
           CheckResponse(response, HttpStatusCode.OK);
         }
@@ -435,7 +435,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       using (var httpClient = new HttpClient())
       using (var entityStream = new MemoryStream())
       {
-        PopulateSessionHeader(httpClient, null);
+        PopulateMetangaHeaders(httpClient, null);
         var entityContent = SerializeObjectToJsonContent(deletedEntities, entityStream);
         requestMessage.Content = entityContent;
         using (var response = httpClient.SendAsync(requestMessage).Result)
@@ -480,7 +480,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       using (var httpClient = new HttpClient())
       {
         var entityIdentificator = GetEntityIdentificator(entity);
-        PopulateSessionHeader(httpClient, entityIdentificator.Value);
+        PopulateMetangaHeaders(httpClient, entityIdentificator.Value);
         var serviceUri = CombineUri(entity.GetType().Name, entityIdentificator.Key);
         using (var response = httpClient.DeleteAsync(serviceUri).Result)
           CheckResponse(response, HttpStatusCode.OK);
@@ -521,7 +521,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       IEnumerable<T> entity;
       using (var httpClient = new HttpClient())
       {
-        PopulateSessionHeader(httpClient, null);
+        PopulateMetangaHeaders(httpClient, null);
         using (var result = httpClient.GetAsync(serviceUri))
         {
           var response = result.Result;
@@ -544,7 +544,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       //Error Message: Metanga.SoftwareDevelopmentKit.Rest.MetangaException: Session verification failed. Session 81452fcf-013a-2bbc-cd94-4d68b1ecc977 has expired.
 //      using (var httpClient = new HttpClient())
 //      {
-//        PopulateSessionHeader(httpClient, TypeOfIdExternal);
+//        PopulateMetangaHeader(httpClient, TypeOfIdExternal);
 //        var serviceUri = new Uri(ServiceAddress, RestServiceSession);
 //        using (var response = httpClient.DeleteAsync(serviceUri).Result)
 //          CheckResponse(response, HttpStatusCode.OK);
@@ -586,7 +586,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       var serviceUri = CombineUri(entityName);
       using (var httpClient = new HttpClient())
       {
-        PopulateSessionHeader(httpClient, string.Empty, addCustomHeaders);
+        PopulateMetangaHeaders(httpClient, string.Empty, addCustomHeaders);
 
         using (var entityStream = new MemoryStream())
         {
@@ -596,7 +596,8 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         }
       }
     }
-    private void PopulateSessionHeader(HttpClient httpClient, string typeId, Dictionary<string, string> addCustomHeaders = null)
+
+    private void PopulateMetangaHeaders(HttpClient httpClient, string typeId, Dictionary<string, string> addCustomHeaders = null)
     {
       httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
       if (!string.IsNullOrEmpty(typeId))
@@ -614,7 +615,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
 
       using (var httpClient = new HttpClient())
       {
-        PopulateSessionHeader(httpClient, typeOfId);
+        PopulateMetangaHeaders(httpClient, typeOfId);
         using (var result = httpClient.GetAsync(serviceUri))
         {
           var response = result.Result;
