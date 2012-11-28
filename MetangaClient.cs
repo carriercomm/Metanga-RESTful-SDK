@@ -12,7 +12,6 @@ using System.Xml;
 using Metanga.SoftwareDevelopmentKit.Proxy;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
 using System.IO;
 using Newtonsoft.Json.Serialization;
 
@@ -95,33 +94,17 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       return serializer;
     }
 
-    private static StreamContent GetJsonContent(JToken jsonValue, Stream httpStream)
-    {
-      if (jsonValue == null) throw new ArgumentNullException("jsonValue");
-      if (httpStream == null) throw new ArgumentNullException("httpStream");
-      using (var jsonTextWriter = new JsonTextWriter(new StreamWriter(httpStream, Encoding)) {CloseOutput = false})
-      {
-        jsonValue.WriteTo(jsonTextWriter);
-        jsonTextWriter.Flush();
-      }
-      httpStream.Seek(0, SeekOrigin.Begin);
-      var jsonContent = new StreamContent(httpStream);
-      var contentType = new MediaTypeHeaderValue("application/json");
-      jsonContent.Headers.ContentType = contentType;
-      return jsonContent;
-    }
-
-    private  StreamContent SerializeContent(object entity, Stream entityStream)
+    private StreamContent SerializeContent(object content, Stream entityStream)
     {
       if (entityStream == null) throw new ArgumentNullException("entityStream");
 
       switch (ContentType)
       {
         case MetangaContentType.Json:
-          SerializeToJson(entity, entityStream);
+          SerializeToJson(content, entityStream);
           break;
         case MetangaContentType.Xml:
-          SerializeToXml(entity, entityStream);
+          SerializeToXml(content, entityStream);
           break;
         default:
           throw new NotSupportedException();
@@ -134,17 +117,18 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       return streamContent;
     }
 
-    private static void SerializeToJson (object entity, Stream entityStream)
+    private static void SerializeToJson (object content, Stream entityStream)
     {
       var jsonTextWriter = new JsonTextWriter(new StreamWriter(entityStream, Encoding)) { CloseOutput = false };
-      JsonSerializer.Serialize(jsonTextWriter, entity);
+      JsonSerializer.Serialize(jsonTextWriter, content);
       jsonTextWriter.Flush();
     }
 
-    private static void SerializeToXml(object entity, Stream entityStream)
+    private static void SerializeToXml(object content, Stream entityStream)
     {
-      var serializer = new DataContractSerializer(typeof(object));
-      serializer.WriteObject(entityStream, entity);
+      var isEntity = content is Entity;
+      var serializer = new DataContractSerializer(isEntity ? typeof(Entity) : content.GetType());
+      serializer.WriteObject(entityStream, content);
     }
 
     private static KeyValuePair<string, string> GetEntityIdentificator(Entity entity)
@@ -563,27 +547,20 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     private Guid CreateSession()
     {
       var sessionAddress = new Uri(ServiceAddress, RestServiceSession);
-      var credentials = (dynamic)new JObject();
-      credentials.UserName = UserName;
-      credentials.Password = Password;
-      using (var credentialStream = new MemoryStream())
+      var credentials = new PasswordCredential {Password = Password, UserName = UserName};
+      using (var httpClient = new HttpClient())
       {
-        StreamContent credentialsContent = GetJsonContent(credentials, credentialStream);
-        dynamic sessionObject;
-        using (var httpClient = new HttpClient())
+        using (var credentialStream = new MemoryStream())
         {
-          var response = httpClient.PostAsync(sessionAddress, credentialsContent).Result;
+          var serializedContent = SerializeContent(credentials, credentialStream);
+          var response = httpClient.PostAsync(sessionAddress, serializedContent).Result;
           CheckResponse(response, HttpStatusCode.Created);
-          var responseContent = response.Content.ReadAsStreamAsync();
-          using (var streamReader = new StreamReader(responseContent.Result, Encoding))
-          {
-            var jsonTextReader = new JsonTextReader(streamReader);
-            sessionObject = JToken.Load(jsonTextReader);
-          }
+          var responseContent = response.Content.ReadAsStreamAsync().Result;
+          return DeserializeContent<Guid>(responseContent);
         }
-        return new Guid(sessionObject.Value);
       }
     }
+
     private HttpResponseMessage ProcessEntity(Entity entity, ProcessRequest method, Dictionary<string, string> addCustomHeaders = null)
     {
       var entityName = entity.GetType().Name;
