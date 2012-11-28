@@ -227,7 +227,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     public Invoice Enroll(Subscription subscription, Account account, InvoiceAction invoiceAction)
     {
       var enrollmentAddress = new Uri(ServiceAddress, RestServiceEnrollment);
-      var enrollParams = new {Subscription = subscription, Account = account};
+      var enrollParams = new  EnrollParameters {Subscription = subscription, Account = account};
       using (var credentialStream = new MemoryStream())
       {
         var enrollParamsContent = SerializeContent(enrollParams, credentialStream);
