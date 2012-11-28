@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Globalization;
+using System.Net;
 using System.Net.Http;
 using Metanga.SoftwareDevelopmentKit.Proxy;
 using Metanga.SoftwareDevelopmentKit.Rest;
@@ -73,7 +74,7 @@ namespace Metanga.Example
         var billableEvent = new UsageEvent
         {
           Originator = new Account { ExternalId = subscription.Account.ExternalId },
-          Product = new Product { ExternalId = externalProductId + "-00-B"}, // the "B" represents the usage product
+          Product = new Product { ExternalId = externalProductId + "-00-B" }, // the "B" represents the usage product
           Quantity = 1000m,
           UnitOfMeasure = "1",
           StartTime = DateTime.Now
@@ -87,6 +88,48 @@ namespace Metanga.Example
                       };
         client.MeterUsageEvents(batch, new Collection<BillableEvent> { billableEvent });
       }
+
+      //Examples for ElectronicEntity
+      var externalAccountId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);  
+      var account = CreateAccount(externalAccountId);
+      PrintConsoleMessage("Running Create account for Electronic payment Example...");
+      var accountId = client.CreateEntity(account);
+      // Create a credit card in Payment Broker and add the token to the account
+      PrintConsoleMessage("Running Create credit card for Electronic payment Example...");
+      var creditCardToken = CreateCreditCardInPaymentBroker(account);
+      account.PaymentInstruments = new PaymentInstrumentMasked[] { new CreditCardMasked { InstrumentId = creditCardToken } };
+      
+      var electronicPaymentSubmit = new ElectronicPayment
+      {
+        Payer = new Account { EntityId = accountId },
+        PaymentInstrument = new CreditCardMasked { InstrumentId = creditCardToken },
+        Amount = 110M,
+        Currency = "USD",
+        PaymentOperation = ElectronicPaymentOperation.Submit,
+        Description = new Dictionary<string, string> { { "en-us", "This is the SALE transaction." } }
+      };
+      PrintConsoleMessage("Running Create Sale operation for Electronic payment Example...");
+      var result = client.ProcessElectronicPayment(electronicPaymentSubmit);
+
+      var electronicPaymentCredit = new ElectronicPayment
+      {
+        Amount = 100M,
+        PaymentOperation = ElectronicPaymentOperation.Credit,
+        Reference = new ElectronicPayment { EntityId = result.EntityId },
+        Description = new Dictionary<string, string> { { "en-us", "This is the Credit transaction." } }
+      };
+      PrintConsoleMessage("Running Create Credit operation for Electronic payment Example...");
+      var resultCredit = client.ProcessElectronicPayment(electronicPaymentCredit);
+
+      var electronicPaymentReverse = new ElectronicPayment
+      {
+        PaymentOperation = ElectronicPaymentOperation.Reverse,
+        Reference = new ElectronicPayment { EntityId = resultCredit.EntityId },
+        Description = new Dictionary<string, string> { { "en-us", "This is the Reverce transaction." } }
+      };
+      PrintConsoleMessage("Running Create Reverce operation for Electronic payment Example...");
+      var resultReverse = client.ProcessElectronicPayment(electronicPaymentReverse);
+
 
       PrintConsoleMessage("Closing connection to Metanga...");
       CloseMetangaClient(client);
