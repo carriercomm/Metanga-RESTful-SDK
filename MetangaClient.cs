@@ -518,8 +518,15 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
           var response = result.Result;
           CheckResponse(response, HttpStatusCode.OK);
           var responseContent = response.Content.ReadAsStreamAsync().Result;
-          var baseEntities = DeserializeContent<IEnumerable<Entity>>(responseContent);
-          return baseEntities.Select(baseEntity => baseEntity as T).ToArray();
+          switch (ContentType)
+          {
+            case MetangaContentType.Json:
+              return DeserializeContent<IEnumerable<T>>(responseContent);
+            case MetangaContentType.Xml:
+              return DeserializeContent<IEnumerable<Entity>>(responseContent).Select(x=>x as T);
+            default:
+              throw new NotSupportedException();
+          }
         }
       }
     }
