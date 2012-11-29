@@ -70,20 +70,22 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
 
     private static void GenerateExceptionFromResponse(HttpResponseMessage httpResponseMessage)
     {
-      if (httpResponseMessage == null)
-        throw new ArgumentNullException("httpResponseMessage");
-      using (var streamReader = new StreamReader(httpResponseMessage.Content.ReadAsStreamAsync().Result, Encoding))
-      {
-        var jsonTextReader = new JsonTextReader(streamReader);
-        var errorJsonObject = (dynamic) JsonSerializer.Deserialize(jsonTextReader);
+        if (httpResponseMessage == null)
+            throw new ArgumentNullException("httpResponseMessage");
 
-        var errorId = Guid.Parse(errorJsonObject.ErrorId.ToString());
-        var errorMessage = errorJsonObject.ErrorMessage.ToString();
-        throw new MetangaException(errorMessage, errorId);
-      }
+        ErrorData errorData;
+        var stream = httpResponseMessage.Content.ReadAsStreamAsync().Result;
+        using (var streamReader = new StreamReader(stream, Encoding))
+        {
+            var jsonTextReader = new JsonTextReader(streamReader);
+            errorData = JsonSerializer.Deserialize<ErrorData>(jsonTextReader);
+        }
+        //TODO: use DeserializeContent
+        // var errorData = DeserializeContent<ErrorData>(stream);
+        throw new MetangaException(errorData.ErrorMessage, errorData.ErrorId);
     }
 
-    private static JsonSerializer CreateJsonSerializer()
+      private static JsonSerializer CreateJsonSerializer()
     {
       var jsonSerializerSettings = new JsonSerializerSettings();
       jsonSerializerSettings.Converters.Add(new IsoDateTimeConverter());

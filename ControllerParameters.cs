@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 using Metanga.SoftwareDevelopmentKit.Proxy;
 
 namespace Metanga.SoftwareDevelopmentKit.Rest
@@ -34,4 +35,21 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     public string Password { get; set; }
   }
 
+  /// <summary>
+  /// Contains details about errors that occur while processing
+  /// </summary>
+  [DataContract(Namespace = "metanga.com")]
+  internal class ErrorData
+  {
+      /// <summary>
+      /// A description of the error
+      /// </summary>
+      [DataMember]
+      public string ErrorMessage { get; set; }
+      /// <summary>
+      /// A unique id for the error
+      /// </summary>
+      [DataMember]
+      public Guid ErrorId { get; set; }
+  }
 }
