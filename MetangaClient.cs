@@ -400,6 +400,8 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         var enrollParamsContent = SerializeContent(newEntities, credentialStream);
         using (var httpClient = new HttpClient())
         {
+          var entityCount = newEntities.Count();
+          if (entityCount > 100) httpClient.Timeout = new TimeSpan(0, 0, entityCount); // for more than 100 entities, set a timeout that allows for 1 second
           PopulateMetangaHeaders(httpClient, null);
           var response = httpClient.PostAsync(enrollmentAddress, enrollParamsContent).Result;
           CheckResponse(response, HttpStatusCode.Created);
@@ -422,6 +424,8 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         var enrollParamsContent = SerializeContent(newEntities, credentialStream);
         using (var httpClient = new HttpClient())
         {
+          var entityCount = newEntities.Count();
+          if (entityCount > 100) httpClient.Timeout = new TimeSpan(0, 0, entityCount); // for more than 100 entities, set a timeout that allows for 1 second
           PopulateMetangaHeaders(httpClient, null);
           var response = httpClient.PutAsync(enrollmentAddress, enrollParamsContent).Result;
           CheckResponse(response, HttpStatusCode.OK);
@@ -441,6 +445,8 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       using (var httpClient = new HttpClient())
       using (var entityStream = new MemoryStream())
       {
+        var entityCount = deletedEntities.Count();
+        if (entityCount > 100) httpClient.Timeout = new TimeSpan(0, 0, entityCount); // for more than 100 entities, set a timeout that allows for 1 second
         PopulateMetangaHeaders(httpClient, null);
         var entityContent = SerializeContent(deletedEntities, entityStream);
         requestMessage.Content = entityContent;
