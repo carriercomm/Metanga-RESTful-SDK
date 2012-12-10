@@ -129,7 +129,14 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     private static void SerializeToXml(object content, Stream entityStream)
     {
       var isEntity = content is Entity;
-      var serializer = new DataContractSerializer(isEntity ? typeof(Entity) : content.GetType());
+      Type type;
+      if (isEntity) 
+        type = typeof (Entity);
+      else if (content is IEnumerable<Entity>)
+        type = typeof (IEnumerable<Entity>);
+      else
+        type = content.GetType();
+      var serializer = new DataContractSerializer(type);
       serializer.WriteObject(entityStream, content);
     }
 
@@ -332,13 +339,14 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     public void MeterUsageEvents(UsageBatch batch, IEnumerable<BillableEvent> billableEvents)
     {
       var meterUsageAddress = new Uri(ServiceAddress, RestServiceMeterUsageEvents);
-      var meterParams = new { Batch = batch, BillableEvents = billableEvents };
+      var meterParams = new MeterUsageEventsParameters { Batch = batch, BillableEvents = billableEvents };
       using (var credentialStream = new MemoryStream())
       {
         var meterParamsContent = SerializeContent(meterParams, credentialStream);
         using (var httpClient = new HttpClient())
         {
-          httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
+          PopulateMetangaHeaders(httpClient, null);
+
           var response = httpClient.PostAsync(meterUsageAddress, meterParamsContent).Result;
           CheckResponse(response, HttpStatusCode.Created);
         }
