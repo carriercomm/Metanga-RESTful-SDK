@@ -136,8 +136,8 @@ namespace Metanga.Example
         Reference = new ElectronicPayment { EntityId = resultCredit.EntityId },
         Description = new Dictionary<string, string> { { "en-us", "This is the Reverce transaction." } }
       };
-      PrintConsoleMessage("Running Create Reverce operation for Electronic payment Example...");
-      var resultReverse = client.ProcessElectronicPayment(electronicPaymentReverse);
+      PrintConsoleMessage("Running Create Reverse operation for Electronic payment Example...");
+      client.ProcessElectronicPayment(electronicPaymentReverse);
 
 
       PrintConsoleMessage("Closing connection to Metanga...");
