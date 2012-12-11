@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Globalization;
-using System.Net;
 using System.Net.Http;
 using Metanga.SoftwareDevelopmentKit.Proxy;
 using Metanga.SoftwareDevelopmentKit.Rest;
@@ -127,8 +126,8 @@ namespace Metanga.Example
         Reference = new ElectronicPayment { EntityId = resultCredit.EntityId },
         Description = new Dictionary<string, string> { { "en-us", "This is the Reverce transaction." } }
       };
-      PrintConsoleMessage("Running Create Reverce operation for Electronic payment Example...");
-      var resultReverse = client.ProcessElectronicPayment(electronicPaymentReverse);
+      PrintConsoleMessage("Running Create Reverse operation for Electronic payment Example...");
+      client.ProcessElectronicPayment(electronicPaymentReverse);
 
 
       PrintConsoleMessage("Closing connection to Metanga...");
