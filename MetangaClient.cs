@@ -516,15 +516,24 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       return RetrieveEntity<T>(TypeOfIdExternal, externalId);
     }
 
+    private static Type ResolveBaseEntityType(Type type)
+    {
+      if (type.BaseType == null || type.BaseType == typeof(Entity) || type.BaseType == typeof(ExtensibleEntity))
+        return type;
+      return ResolveBaseEntityType(type.BaseType);
+    }
+
     /// <summary>
     /// <para><strong><font color="green">Please note, this is only beta-version of functionality. You should use it for testing purposes.</font></strong></para>
     /// By using this method, you are able to retrieve all the entities of a certain type in one bulk operetion.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
+    /// <param name="requestParams"></param>
     /// <returns>Collection of entities of a certain type.</returns>
-    public IEnumerable<T> RetrieveEntitiesBulk<T>() where T : Entity, new()
+    public IEnumerable<T> RetrieveEntitiesBulk<T>(string requestParams) where T : Entity, new()
     {
-      var serviceUri = CombineUri(RestServiceBulk.ToString(), typeof(T).Name);
+      var typeName = ResolveBaseEntityType(typeof(T)).Name;
+      var serviceUri = CombineUri(string.Format(CultureInfo.InvariantCulture, "{0}?{1}", typeName, requestParams));
       
       using (var httpClient = new HttpClient())
       {
@@ -546,6 +555,17 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         }
       }
     }
+    /// <summary>
+    ///  <para><strong><font color="green">Please note, this is only beta-version of functionality. You should use it for testing purposes.</font></strong></para>
+    /// By using this method, you are able to retrieve all the entities of a certain type in one bulk operetion.
+    /// </summary>
+    /// <typeparam name="T">Entity type.</typeparam>
+    /// <returns>Collection of entities of a certain type.</returns>
+    public IEnumerable<T> RetrieveEntitiesBulk<T>() where T : Entity, new()
+    {
+      return RetrieveEntitiesBulk<T>(null);
+    }
+
     /// <summary>
     /// Close session
     /// </summary>
