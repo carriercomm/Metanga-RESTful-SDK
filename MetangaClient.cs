@@ -684,7 +684,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
 
     private static Type ResolveBaseEntityType(Type type)
     {
-      if (type.BaseType == null || type.BaseType == typeof(Entity) || type.BaseType == typeof(ExtensibleEntity) || type.BaseType == typeof(Payment))
+      if (type.BaseType == null || type.BaseType == typeof(Entity) || type.BaseType == typeof(ExtensibleEntity) || type.BaseType == typeof(ManualPayment) || type.BaseType == typeof(Payment))
         return type;
       return ResolveBaseEntityType(type.BaseType);
     }
