@@ -548,7 +548,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
             case MetangaContentType.Json:
               return DeserializeContent<IEnumerable<T>>(responseContent);
             case MetangaContentType.Xml:
-              return DeserializeContent<IEnumerable<Entity>>(responseContent).Select(x=>x as T);
+              return DeserializeContent<IEnumerable<T>>(responseContent).Select(x=>x as T);
             default:
               throw new NotSupportedException();
           }
