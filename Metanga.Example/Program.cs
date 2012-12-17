@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Globalization;
-using System.Net;
+using System.Linq;
 using System.Net.Http;
 using Metanga.SoftwareDevelopmentKit.Proxy;
 using Metanga.SoftwareDevelopmentKit.Rest;
@@ -47,6 +47,15 @@ namespace Metanga.Example
       }
       var productIds = CreateEntityBulkExample(client, products);
       if (productIds == null)
+      {
+        EndExample();
+        return;
+      }
+
+      PrintConsoleMessage("Running Bulk Product Retrieve Example...");
+      var odataQuery = string.Format(CultureInfo.InvariantCulture, "$filter=startswith(ExternalId, '{0}')&$top=10", externalProductId);
+      var retrievedProducts = RetrieveEntityBulkExample<Product>(client, odataQuery);
+      if (retrievedProducts.Count() != 10 || !retrievedProducts.All(x=>productIds.Contains(x.EntityId.GetValueOrDefault())))
       {
         EndExample();
         return;
@@ -244,6 +253,20 @@ namespace Metanga.Example
         PrintConsoleMessage(String.Format("An error has occurred during entity creation: Id={0}, Message={1}", e.ErrorId, e.Message));
       }
       return entityId;
+    }
+
+    private static IEnumerable<T> RetrieveEntityBulkExample<T>(MetangaClient client, string odataQuery) where T: Entity, new()
+    {
+      IEnumerable<T> entities= null;
+      try
+      {
+        entities = client.RetrieveEntitiesBulk<T>(odataQuery);
+      }
+      catch (MetangaException e)
+      {
+        PrintConsoleMessage(String.Format("An error has occurred during entity creation: Id={0}, Message={1}", e.ErrorId, e.Message));
+      }
+      return entities;
     }
 
     /// <summary>
