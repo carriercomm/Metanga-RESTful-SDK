@@ -389,8 +389,9 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     ///<param name="startDate">Date from which Statement will be calculated</param>
     ///<param name="endDate">Date up to which Statement will be calculated</param>
     /// <returns>KeyValue pair - currency : Statement object</returns>
-    public Dictionary<string, Statement> RetrieveStatement(Account account, DateTime startDate, DateTime endDate)
+    public Dictionary<string, Statement> RetrieveStatement(Entity account, DateTime startDate, DateTime endDate)
     {
+      if (account == null) throw new ArgumentNullException("account");
       var accountIdentifier = account.EntityId.HasValue ? account.EntityId.Value.ToString() : account.ExternalId;
       if (String.IsNullOrEmpty(accountIdentifier))
       {
