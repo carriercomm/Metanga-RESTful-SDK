@@ -30,6 +30,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     private static readonly Uri RestServiceMeterUsageEvents = new Uri("RestService/meterusageevents", UriKind.Relative);
     private static readonly Uri RestServiceElectronicPayment = new Uri("RestService/electronicpayment", UriKind.Relative);
     private static readonly Uri RestServiceBulk = new Uri("RestService/bulk", UriKind.Relative);
+    const string RestServiceRetrieveStatement = "RestService/account/{0}/statement/startDateTime={1}/endDateTime={2}";
     private const string TypeOfIdMetanga = "Metanga";
     private const string TypeOfIdExternal = "External";
 
@@ -378,6 +379,41 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         }
       }
     }
+    #endregion
+
+    #region RetieveStatement
+    ///<summary>
+    /// Retieve Balance Statement for a certain time range and account
+    ///</summary>
+    ///<param name="account">Account for which statement will be retrieved</param>
+    ///<param name="startDate">Date from which Statement will be calculated</param>
+    ///<param name="endDate">Date up to which Statement will be calculated</param>
+    /// <returns>KeyValue pair - currency : Statement object</returns>
+    public Dictionary<string, Statement> RetrieveStatement(Account account, DateTime startDate, DateTime endDate)
+    {
+      var accountIdentifier = account.EntityId.HasValue ? account.EntityId.Value.ToString() : account.ExternalId;
+      if (String.IsNullOrEmpty(accountIdentifier))
+      {
+        throw new MetangaException("Account is not found");
+      }
+      using (var httpClient = new HttpClient())
+      {
+        PopulateMetangaHeaders(httpClient, null);
+        const string template = "yyyyMMddTHHmmss";
+        var formattedRelativePath = String.Format(CultureInfo.InvariantCulture, RestServiceRetrieveStatement,
+                                            accountIdentifier,
+                                            startDate.ToString(template, CultureInfo.InvariantCulture),
+                                            endDate.ToString(template, CultureInfo.InvariantCulture));
+        var restServiceRetrieveStatementUri = new Uri(formattedRelativePath, UriKind.Relative);
+        var response =
+          httpClient.GetAsync(new Uri(ServiceAddress, restServiceRetrieveStatementUri)).Result;
+        CheckResponse(response, HttpStatusCode.OK);
+        var responseContent = response.Content.ReadAsStreamAsync().Result;
+        return DeserializeContent<Dictionary<string, Statement>>(responseContent);
+      }
+    }
+
+
     #endregion
 
     /// <summary>
