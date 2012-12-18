@@ -516,12 +516,6 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       return RetrieveEntity<T>(TypeOfIdExternal, externalId);
     }
 
-    private static Type ResolveBaseEntityType(Type type)
-    {
-      if (type.BaseType == null || type.BaseType == typeof(Entity) || type.BaseType == typeof(ExtensibleEntity))
-        return type;
-      return ResolveBaseEntityType(type.BaseType);
-    }
 
     /// <summary>
     /// <para><strong><font color="green">Please note, this is only beta-version of functionality. You should use it for testing purposes.</font></strong></para>
@@ -686,6 +680,13 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         uri.Append("/" + segment);
       var relativeUri = new Uri(uri.ToString(), UriKind.Relative);
       return new Uri(ServiceAddress, relativeUri);
+    }
+
+    private static Type ResolveBaseEntityType(Type type)
+    {
+      if (type.BaseType == null || type.BaseType == typeof(Entity) || type.BaseType == typeof(ExtensibleEntity) || type.BaseType == typeof(ManualPayment) || type.BaseType == typeof(Payment))
+        return type;
+      return ResolveBaseEntityType(type.BaseType);
     }
 
     #endregion
