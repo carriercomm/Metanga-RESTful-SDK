@@ -39,19 +39,20 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
   /// <summary>
   /// Contains details about errors that occur while processing
   /// </summary>
-  [DataContract(Namespace = "metanga.com")]
+  [DataContract(Namespace = "http://metanga.com")]
   internal class ErrorData
   {
-      /// <summary>
-      /// A description of the error
-      /// </summary>
-      [DataMember]
-      public string ErrorMessage { get; set; }
-      /// <summary>
-      /// A unique id for the error
-      /// </summary>
-      [DataMember]
-      public Guid ErrorId { get; set; }
+    /// <summary>
+    /// A unique id for the error
+    /// </summary>
+    [DataMember]
+    public Guid ErrorId { get; set; }
+    /// <summary>
+    /// A description of the error
+    /// </summary>
+    [DataMember]
+    public string ErrorMessage { get; set; }
+
   }
 
   /// <summary>

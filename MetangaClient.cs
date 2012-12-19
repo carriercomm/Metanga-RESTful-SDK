@@ -62,29 +62,24 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
 
     #region Private static methods
 
-    private static void CheckResponse(HttpResponseMessage response, HttpStatusCode expectedStatusCode)
+    private void CheckResponse(HttpResponseMessage response, HttpStatusCode expectedStatusCode)
     {
       if (response.IsSuccessStatusCode && response.StatusCode == expectedStatusCode)
         return;
       GenerateExceptionFromResponse(response);
     }
 
-    private static void GenerateExceptionFromResponse(HttpResponseMessage httpResponseMessage)
-    {
-        if (httpResponseMessage == null)
-            throw new ArgumentNullException("httpResponseMessage");
 
-        ErrorData errorData;
-        var stream = httpResponseMessage.Content.ReadAsStreamAsync().Result;
-        using (var streamReader = new StreamReader(stream, Encoding))
-        {
-            var jsonTextReader = new JsonTextReader(streamReader);
-            errorData = JsonSerializer.Deserialize<ErrorData>(jsonTextReader);
-        }
-        //TODO: use DeserializeContent
-        // var errorData = DeserializeContent<ErrorData>(stream);
-        throw new MetangaException(errorData.ErrorMessage, errorData.ErrorId);
+    private void GenerateExceptionFromResponse(HttpResponseMessage httpResponseMessage)
+    {
+      if (httpResponseMessage == null)
+        throw new ArgumentNullException("httpResponseMessage");
+
+      var stream = httpResponseMessage.Content.ReadAsStreamAsync().Result;
+      var errorData = DeserializeContent<ErrorData>(stream);
+      throw new MetangaException(errorData.ErrorMessage, errorData.ErrorId);
     }
+
 
       private static JsonSerializer CreateJsonSerializer()
     {
