@@ -559,7 +559,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     /// By using this method, you are able to retrieve all the entities of a certain type in one bulk operetion.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    /// <param name="requestParams"></param>
+    /// <param name="requestParams">OData URI Query string which is used to determine filtering options</param>
     /// <returns>Collection of entities of a certain type.</returns>
     public IEnumerable<T> RetrieveEntitiesBulk<T>(string requestParams) where T : Entity, new()
     {
