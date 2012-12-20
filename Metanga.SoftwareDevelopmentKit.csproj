@@ -91,6 +91,9 @@
     <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.Package.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.Statement.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Service References\Proxy\Metanga.wsdl" />
   </ItemGroup>
   <ItemGroup>
