@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="0dc68b0d-755b-4695-b853-b9f15b1025b9" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="885d3475-56ab-4e04-be14-9c685bdffcd7" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
     <EnableDataBinding>true</EnableDataBinding>
@@ -18,10 +18,10 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="https://metangadev07.metratech.com/WSDL/" Protocol="http" SourceId="1" />
+    <MetadataSource Address="https://metangadev09.metratech.com/wsdl/" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="Metanga.wsdl" MetadataType="Wsdl" ID="a007206c-3fe8-430b-8262-7259b18a4eae" SourceId="1" SourceUrl="https://metangadev07.metratech.com/WSDL/" />
+    <MetadataFile FileName="Metanga.wsdl" MetadataType="Wsdl" ID="eb299026-fb8d-4543-8a36-dd2aeebeff61" SourceId="1" SourceUrl="https://metangadev09.metratech.com/wsdl/" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
