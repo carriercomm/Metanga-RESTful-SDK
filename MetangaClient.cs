@@ -30,7 +30,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     private static readonly Uri RestServiceMeterUsageEvents = new Uri("RestService/meterusageevents", UriKind.Relative);
     private static readonly Uri RestServiceElectronicPayment = new Uri("RestService/electronicpayment", UriKind.Relative);
     private static readonly Uri RestServiceBulk = new Uri("RestService/bulk", UriKind.Relative);
-    const string RestServiceRetrieveStatement = "RestService/account/{0}/statement/startDateTime={1}/endDateTime={2}";
+    private static readonly Uri RestServiceAccount = new Uri("RestService/"+typeof(Account).Name, UriKind.Relative);
     private const string TypeOfIdMetanga = "Metanga";
     private const string TypeOfIdExternal = "External";
 
@@ -385,25 +385,23 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     ///<param name="startDate">Date from which Statement will be calculated</param>
     ///<param name="endDate">Date up to which Statement will be calculated</param>
     /// <returns>KeyValue pair - currency : Statement object</returns>
-    public Dictionary<string, Statement> RetrieveStatement(Entity account, DateTime startDate, DateTime endDate)
+    public Dictionary<string, Statement> RetrieveStatement(Entity account, DateTime? startDate, DateTime? endDate)
     {
-      if (account == null) throw new ArgumentNullException("account");
-      var accountIdentifier = account.EntityId.HasValue ? account.EntityId.Value.ToString() : account.ExternalId;
-      if (String.IsNullOrEmpty(accountIdentifier))
-      {
-        throw new MetangaException("Account is not found");
-      }
       using (var httpClient = new HttpClient())
       {
-        PopulateMetangaHeaders(httpClient, null);
-        const string template = "yyyyMMddTHHmmss";
-        var formattedRelativePath = String.Format(CultureInfo.InvariantCulture, RestServiceRetrieveStatement,
-                                            accountIdentifier,
-                                            startDate.ToString(template, CultureInfo.InvariantCulture),
-                                            endDate.ToString(template, CultureInfo.InvariantCulture));
-        var restServiceRetrieveStatementUri = new Uri(formattedRelativePath, UriKind.Relative);
-        var response =
-          httpClient.GetAsync(new Uri(ServiceAddress, restServiceRetrieveStatementUri)).Result;
+        var entityIdentificator = GetEntityIdentificator(account);
+        PopulateMetangaHeaders(httpClient, entityIdentificator.Value);
+        
+        var queryString = System.Web.HttpUtility.ParseQueryString(string.Empty);
+        if (startDate.HasValue)
+          queryString["startDateTime"] = startDate.Value.ToString("s");
+        if (endDate.HasValue)
+          queryString["endDateTime"] = endDate.Value.ToString("s");
+
+        var relativeUri = new Uri(RestServiceAccount + "/" + entityIdentificator.Key + "/statement" + (queryString.Count > 0 ? "?" + queryString : string.Empty), UriKind.Relative);
+
+        var serviceUri = new Uri(ServiceAddress, relativeUri);
+        var response = httpClient.GetAsync(serviceUri).Result;
         CheckResponse(response, HttpStatusCode.OK);
         var responseContent = response.Content.ReadAsStreamAsync().Result;
         return DeserializeContent<Dictionary<string, Statement>>(responseContent);
