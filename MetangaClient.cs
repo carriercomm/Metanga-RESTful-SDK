@@ -377,6 +377,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     #endregion
 
     #region RetieveStatement
+
     ///<summary>
     /// Retieve Balance Statement for a certain time range and account
     ///</summary>
@@ -408,7 +409,6 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         return DeserializeContent<Dictionary<string, Statement>>(responseContent);
       }
     }
-
 
     #endregion
 
