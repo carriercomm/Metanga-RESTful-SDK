@@ -457,9 +457,9 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         
         var queryString = System.Web.HttpUtility.ParseQueryString(string.Empty);
         if (startDate.HasValue)
-          queryString["startDateTime"] = startDate.Value.ToString("s");
+          queryString["startDateTime"] = startDate.Value.ToString("s", CultureInfo.InvariantCulture);
         if (endDate.HasValue)
-          queryString["endDateTime"] = endDate.Value.ToString("s");
+          queryString["endDateTime"] = endDate.Value.ToString("s", CultureInfo.InvariantCulture);
 
         var relativeUri = new Uri(RestServiceAccount + "/" + entityIdentificator.Key + "/statement" + (queryString.Count > 0 ? "?" + queryString : string.Empty), UriKind.Relative);
 
@@ -615,12 +615,12 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     /// By using this method, you are able to retrieve all the entities of a certain type in one bulk operetion.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    /// <param name="requestParams">OData URI Query string which is used to determine filtering options</param>
+    /// <param name="requestParameters">OData URI Query string which is used to determine filtering options</param>
     /// <returns>Collection of entities of a certain type.</returns>
-    public IEnumerable<T> RetrieveEntitiesBulk<T>(string requestParams) where T : Entity, new()
+    public IEnumerable<T> RetrieveEntitiesBulk<T>(string requestParameters) where T : Entity, new()
     {
       var typeName = ResolveBaseEntityType(typeof(T)).Name;
-      var serviceUri = CombineUri(string.Format(CultureInfo.InvariantCulture, "{0}?{1}", typeName, requestParams));
+      var serviceUri = CombineUri(string.Format(CultureInfo.InvariantCulture, "{0}?{1}", typeName, requestParameters));
       
       using (var httpClient = new HttpClient())
       {
