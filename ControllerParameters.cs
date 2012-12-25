@@ -47,11 +47,24 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     /// </summary>
     [DataMember]
     public Guid ErrorId { get; set; }
+
     /// <summary>
     /// A description of the error
     /// </summary>
     [DataMember]
     public string ErrorMessage { get; set; }
+
+    /// <summary>
+    /// Associated Entity
+    /// </summary>
+    [DataMember]
+    public Entity AssociatedEntity { get; set; }
+
+    /// <summary>
+    /// Inner Errors
+    /// </summary>
+    [DataMember]
+    public IEnumerable<MetangaFault> InnerErrors { get; set; }
 
   }
 
