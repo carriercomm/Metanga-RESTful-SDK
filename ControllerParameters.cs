@@ -64,7 +64,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     /// Inner Errors
     /// </summary>
     [DataMember]
-    public IEnumerable<MetangaFault> InnerErrors { get; set; }
+    public IEnumerable<ErrorData> InnerErrors { get; set; }
 
   }
 
