@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using Metanga.SoftwareDevelopmentKit.Proxy;
 using Metanga.SoftwareDevelopmentKit.Rest;
@@ -48,6 +49,12 @@ namespace Metanga.SoftwareDevelopmentKit
     {
     }
 
+    public MetangaAggregateException(ErrorData errorData)
+      : base(errorData.ErrorMessage, errorData.ErrorId)
+    {
+      Exceptions =
+        errorData.InnerErrors.Select(x => new KeyValuePair<Entity, MetangaException>(x.AssociatedEntity, new MetangaException(x.ErrorMessage, x.ErrorId)));
+    }
 
     /// <summary>
     /// GetObjectData
