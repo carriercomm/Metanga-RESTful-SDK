@@ -40,7 +40,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
   /// Contains details about errors that occur while processing
   /// </summary>
   [DataContract(Namespace = "http://metanga.com")]
-  internal class ErrorData
+  public class ErrorData
   {
     /// <summary>
     /// A unique id for the error

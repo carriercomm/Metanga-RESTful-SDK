@@ -79,17 +79,10 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       var stream = httpResponseMessage.Content.ReadAsStreamAsync().Result;
       var errorData = DeserializeContent<ErrorData>(stream);
       if (errorData.InnerErrors != null)
-        ThrowMetangaAggregateException(errorData);
+        throw new MetangaAggregateException(errorData);
+
       throw new MetangaException(errorData.ErrorMessage, errorData.ErrorId);
 
-    }
-
-    private static void ThrowMetangaAggregateException(ErrorData errorData)
-    {
-      throw new MetangaAggregateException(errorData.ErrorMessage)
-              {
-                Exceptions = errorData.InnerErrors.Select(x => new KeyValuePair<Entity, MetangaException>(x.AssociatedEntity, new MetangaException(x.ErrorMessage)))
-              };
     }
     
     private static JsonSerializer CreateJsonSerializer()
