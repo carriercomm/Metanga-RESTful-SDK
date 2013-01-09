@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -487,10 +488,21 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       var enrollmentAddress = new Uri(ServiceAddress, RestServiceBulk);
       using (var credentialStream = new MemoryStream())
       {
-        var enrollParamsContent = SerializeContent(newEntities, credentialStream);
+        StreamContent enrollParamsContent;
+        var entities = newEntities.ToList();
+        if (ContentType == MetangaContentType.Json)
+        {
+          var entityCollection = new Collection<Entity>();
+          foreach (var entity in entities)
+            entityCollection.Add(entity);
+          enrollParamsContent = SerializeContent(entityCollection, credentialStream);
+        }
+        else
+          enrollParamsContent = SerializeContent(newEntities, credentialStream);
+
         using (var httpClient = new HttpClient())
         {
-          var entityCount = newEntities.Count();
+          var entityCount = entities.Count;
           if (entityCount > 100) httpClient.Timeout = new TimeSpan(0, 0, entityCount); // for more than 100 entities, set a timeout that allows for 1 second
           PopulateMetangaHeaders(httpClient, null);
           var response = httpClient.PostAsync(enrollmentAddress, enrollParamsContent).Result;
@@ -500,6 +512,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         }
       }
     }
+
 
     /// <summary>
     /// <para><strong><font color="green">Please note, this is only beta-version of functionality. You should use it for testing purposes.</font></strong></para>
