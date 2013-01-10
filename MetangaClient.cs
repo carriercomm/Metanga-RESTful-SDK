@@ -488,18 +488,8 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       var enrollmentAddress = new Uri(ServiceAddress, RestServiceBulk);
       using (var credentialStream = new MemoryStream())
       {
-        StreamContent enrollParamsContent;
         var entities = newEntities.ToList();
-        if (ContentType == MetangaContentType.Json)
-        {
-          var entityCollection = new Collection<Entity>();
-          foreach (var entity in entities)
-            entityCollection.Add(entity);
-          enrollParamsContent = SerializeContent(entityCollection, credentialStream);
-        }
-        else
-          enrollParamsContent = SerializeContent(newEntities, credentialStream);
-
+        var enrollParamsContent = SerializeContentForBulk(entities, credentialStream);
         using (var httpClient = new HttpClient())
         {
           var entityCount = entities.Count;
@@ -513,6 +503,18 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       }
     }
 
+    private StreamContent SerializeContentForBulk(IEnumerable<Entity> newEntities, Stream credentialStream)
+    {
+      if (ContentType == MetangaContentType.Json)
+      {
+        var entityCollection = new Collection<Entity>();
+        foreach (var entity in newEntities)
+          entityCollection.Add(entity);
+        return SerializeContent(entityCollection, credentialStream);
+      }
+      return SerializeContent(newEntities, credentialStream);
+    }
+
 
     /// <summary>
     /// <para><strong><font color="green">Please note, this is only beta-version of functionality. You should use it for testing purposes.</font></strong></para>
@@ -524,10 +526,11 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       var enrollmentAddress = new Uri(ServiceAddress, RestServiceBulk);
       using (var credentialStream = new MemoryStream())
       {
-        var enrollParamsContent = SerializeContent(newEntities, credentialStream);
+        var entities = newEntities.ToList();
+        var enrollParamsContent = SerializeContentForBulk(entities, credentialStream);
         using (var httpClient = new HttpClient())
         {
-          var entityCount = newEntities.Count();
+          var entityCount = entities.Count;
           if (entityCount > 100) httpClient.Timeout = new TimeSpan(0, 0, entityCount); // for more than 100 entities, set a timeout that allows for 1 second
           PopulateMetangaHeaders(httpClient, null);
           var response = httpClient.PutAsync(enrollmentAddress, enrollParamsContent).Result;
@@ -548,10 +551,11 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       using (var httpClient = new HttpClient())
       using (var entityStream = new MemoryStream())
       {
-        var entityCount = deletedEntities.Count();
+        var entities = deletedEntities.ToList();
+        var entityCount = entities.Count;
         if (entityCount > 100) httpClient.Timeout = new TimeSpan(0, 0, entityCount); // for more than 100 entities, set a timeout that allows for 1 second
         PopulateMetangaHeaders(httpClient, null);
-        var entityContent = SerializeContent(deletedEntities, entityStream);
+        var entityContent = SerializeContentForBulk(entities, entityStream);
         requestMessage.Content = entityContent;
         using (var response = httpClient.SendAsync(requestMessage).Result)
           CheckResponse(response, HttpStatusCode.OK);
