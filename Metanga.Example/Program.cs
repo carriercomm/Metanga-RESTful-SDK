@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using Metanga.SoftwareDevelopmentKit;
 using Metanga.SoftwareDevelopmentKit.Proxy;
 using Metanga.SoftwareDevelopmentKit.Rest;
 using Newtonsoft.Json.Linq;
@@ -66,6 +67,28 @@ namespace Metanga.Example
       var package = CreatePackage(externalPackageId, externalProductId + "-00"); // the "00" is to use the first pair of products created
       var packageId = CreateEntityExample(client, package);
       if (packageId == null)
+      {
+        EndExample();
+        return;
+      }
+
+      PrintConsoleMessage("Running Bulk AggregateException Example...");
+      var wrongAccounts = CreateAccountsWithRandomExternalId();
+      var isErrorOccurred = false;
+      try
+      {
+        client.UpdateEntityBulk(wrongAccounts);
+      }
+      catch (MetangaAggregateException e)
+      {
+        isErrorOccurred = true;
+        PrintConsoleMessage(String.Format("An error has occurred during entity update: Id={0}, Message={1}", e.ErrorId, e.Message));
+        foreach (var childException in e.Exceptions)
+        {
+          PrintConsoleMessage(String.Format("Entity {0} had the following error: {1}", childException.Key.ExternalId, childException.Value.Message));
+        }
+      }
+      if (!isErrorOccurred)
       {
         EndExample();
         return;
@@ -451,6 +474,14 @@ namespace Metanga.Example
         RecurringCycleUnitId = "MO",
         SubscriptionPackageProducts = subscriptionPackageProducts
       };
+    }
+
+    private static IEnumerable<SampleAccount> CreateAccountsWithRandomExternalId()
+    {
+      var accouts = new Collection<SampleAccount>();
+      for (var i = 0; i < 3; i++)
+        accouts.Add(CreateAccount(Guid.NewGuid().ToString()));
+      return accouts;
     }
 
     /// <summary>
