@@ -60,11 +60,13 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ControllerParameters.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="MetangaAggregateException.cs" />
     <Compile Include="MetangaClient.cs" />
     <Compile Include="MetangaException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -97,6 +99,9 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.Package.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.Statement.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\Proxy\Metanga.wsdl" />

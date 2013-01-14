@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
+using Metanga.SoftwareDevelopmentKit;
 using Metanga.SoftwareDevelopmentKit.Proxy;
 using Metanga.SoftwareDevelopmentKit.Rest;
 using Newtonsoft.Json.Linq;
@@ -51,11 +53,42 @@ namespace Metanga.Example
         return;
       }
 
+      PrintConsoleMessage("Running Bulk Product Retrieve Example...");
+      var odataQuery = string.Format(CultureInfo.InvariantCulture, "$filter=startswith(ExternalId, '{0}')&$top=10", externalProductId);
+      var retrievedProducts = RetrieveEntityBulkExample<Product>(client, odataQuery);
+      if (retrievedProducts.Count() != 10 || !retrievedProducts.All(x=>productIds.Contains(x.EntityId.GetValueOrDefault())))
+      {
+        EndExample();
+        return;
+      }
+
       PrintConsoleMessage("Running Package Creation Example...");
       var externalPackageId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
       var package = CreatePackage(externalPackageId, externalProductId + "-00"); // the "00" is to use the first pair of products created
       var packageId = CreateEntityExample(client, package);
       if (packageId == null)
+      {
+        EndExample();
+        return;
+      }
+
+      PrintConsoleMessage("Running Bulk AggregateException Example...");
+      var wrongAccounts = CreateAccountsWithRandomExternalId();
+      var isErrorOccurred = false;
+      try
+      {
+        client.UpdateEntityBulk(wrongAccounts);
+      }
+      catch (MetangaAggregateException e)
+      {
+        isErrorOccurred = true;
+        PrintConsoleMessage(String.Format("An error has occurred during entity update: Id={0}, Message={1}", e.ErrorId, e.Message));
+        foreach (var childException in e.Exceptions)
+        {
+          PrintConsoleMessage(String.Format("Entity {0} had the following error: {1}", childException.Key.ExternalId, childException.Value.Message));
+        }
+      }
+      if (!isErrorOccurred)
       {
         EndExample();
         return;
@@ -245,6 +278,20 @@ namespace Metanga.Example
       return entityId;
     }
 
+    private static IEnumerable<T> RetrieveEntityBulkExample<T>(MetangaClient client, string odataQuery) where T: Entity, new()
+    {
+      IEnumerable<T> entities= null;
+      try
+      {
+        entities = client.RetrieveEntitiesBulk<T>(odataQuery);
+      }
+      catch (MetangaException e)
+      {
+        PrintConsoleMessage(String.Format("An error has occurred during entity creation: Id={0}, Message={1}", e.ErrorId, e.Message));
+      }
+      return entities;
+    }
+
     /// <summary>
     /// Creates a credit card in the payment broker. The account object provides contact information to be
     /// associated to the credit card. This method sets hardcoded values for the credit card.
@@ -427,6 +474,14 @@ namespace Metanga.Example
         RecurringCycleUnitId = "MO",
         SubscriptionPackageProducts = subscriptionPackageProducts
       };
+    }
+
+    private static IEnumerable<SampleAccount> CreateAccountsWithRandomExternalId()
+    {
+      var accouts = new Collection<SampleAccount>();
+      for (var i = 0; i < 3; i++)
+        accouts.Add(CreateAccount(Guid.NewGuid().ToString()));
+      return accouts;
     }
 
     /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -27,9 +28,11 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     private static readonly Uri RestServiceSession = new Uri("RestService/session", UriKind.Relative);
     private static readonly Uri RestServiceEnrollment = new Uri("RestService/enrollment", UriKind.Relative);
     private static readonly Uri RestServiceSubscribe = new Uri("RestService/subscribe", UriKind.Relative);
+    private static readonly Uri RestServiceTransitionSubscription = new Uri("RestService/transitionSubscription", UriKind.Relative);
     private static readonly Uri RestServiceMeterUsageEvents = new Uri("RestService/meterusageevents", UriKind.Relative);
     private static readonly Uri RestServiceElectronicPayment = new Uri("RestService/electronicpayment", UriKind.Relative);
     private static readonly Uri RestServiceBulk = new Uri("RestService/bulk", UriKind.Relative);
+    private static readonly Uri RestServiceAccount = new Uri("RestService/"+typeof(Account).Name, UriKind.Relative);
     private const string TypeOfIdMetanga = "Metanga";
     private const string TypeOfIdExternal = "External";
 
@@ -61,31 +64,29 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
 
     #region Private static methods
 
-    private static void CheckResponse(HttpResponseMessage response, HttpStatusCode expectedStatusCode)
+    private void CheckResponse(HttpResponseMessage response, HttpStatusCode expectedStatusCode)
     {
       if (response.IsSuccessStatusCode && response.StatusCode == expectedStatusCode)
         return;
       GenerateExceptionFromResponse(response);
     }
 
-    private static void GenerateExceptionFromResponse(HttpResponseMessage httpResponseMessage)
+
+    private void GenerateExceptionFromResponse(HttpResponseMessage httpResponseMessage)
     {
-        if (httpResponseMessage == null)
-            throw new ArgumentNullException("httpResponseMessage");
+      if (httpResponseMessage == null)
+        throw new ArgumentNullException("httpResponseMessage");
 
-        ErrorData errorData;
-        var stream = httpResponseMessage.Content.ReadAsStreamAsync().Result;
-        using (var streamReader = new StreamReader(stream, Encoding))
-        {
-            var jsonTextReader = new JsonTextReader(streamReader);
-            errorData = JsonSerializer.Deserialize<ErrorData>(jsonTextReader);
-        }
-        //TODO: use DeserializeContent
-        // var errorData = DeserializeContent<ErrorData>(stream);
-        throw new MetangaException(errorData.ErrorMessage, errorData.ErrorId);
+      var stream = httpResponseMessage.Content.ReadAsStreamAsync().Result;
+      var errorData = DeserializeContent<ErrorData>(stream);
+      if (errorData.InnerErrors != null)
+        throw new MetangaAggregateException(errorData);
+
+      throw new MetangaException(errorData.ErrorMessage, errorData.ErrorId);
+
     }
-
-      private static JsonSerializer CreateJsonSerializer()
+    
+    private static JsonSerializer CreateJsonSerializer()
     {
       var jsonSerializerSettings = new JsonSerializerSettings();
       jsonSerializerSettings.Converters.Add(new IsoDateTimeConverter());
@@ -227,12 +228,19 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     #region Public methods
 
     /// <summary>
-    /// Enroll method
+    /// Takes a Subscription object and an Account object as a parameter and based on the values populated in this object it first creates a new account and then subscribes this account to a specified package. 
+    /// This method returns a reference to an invoice object.
     /// </summary>
-    /// <param name="subscription">new subscription entity</param>
-    /// <param name="account">new account entity</param>
-    /// <param name="invoiceAction">Invoice action</param>
-    /// <returns>return new invoice</returns>
+    /// <param name="subscription">Represents the subscription which will be created in the system by this call.</param>
+    /// <param name="account">Represents the account which will be created in the system by this call.</param>
+    /// <param name="invoiceAction">The purpose of this parameter is to indicate what invoice action will be taken. It can have the next values:
+    /// <ul>
+    /// <li><i>InvoiceNext</i> - The newly calculated charges will be placed into invoices with naturally billing dates. Metanga will leave all new invoices open, and will return an open invoice for the current billing period.</li>
+    /// <li><i>InvoiceNow</i> - The method will return a closed ad-hoc invoice (Invoice Date = Current Date), which incorporates any charges with the next or before billing date.</li>
+    /// <li><i>InvoiceQuote</i> - The method will return an invoice object, which incorporates any charges with the next or before billing date, but these charges won't be saved into database.</li>
+    /// </ul>
+    /// </param>
+    /// <returns>Returns a reference to an invoice object which includes charges generated by this call.</returns>
     public Invoice Enroll(Subscription subscription, Account account, InvoiceAction invoiceAction)
     {
       var enrollmentAddress = new Uri(ServiceAddress, RestServiceEnrollment);
@@ -253,11 +261,18 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     }
 
     /// <summary>
-    /// Create an entity to database and return EntityId. If error occurred, MetangaException should be raised
+    /// Takes a Subscription object as a parameter and based on the values populated in this object it subscribes a specified account to a specified package. 
+    /// This method returns a reference to an invoice object.
     /// </summary>
-    /// <param name="subscription">Metanga subscription entity to Subscribe</param>
-    /// <param name="invoiceAction">Invoice action.</param>
-    /// <returns>Metanga ID of newely created entity</returns>
+    /// <param name="subscription">Represents the subscription which will be created in the system by this call.</param>    
+    /// <param name="invoiceAction">The purpose of this parameter is to indicate what invoice action will be taken. It can have the next values:
+    /// <ul>
+    /// <li><i>InvoiceNext</i> - The newly calculated charges will be placed into invoices with naturally billing dates. Metanga will leave all new invoices open, and will return an open invoice for the current billing period.</li>
+    /// <li><i>InvoiceNow</i> - The method will return a closed ad-hoc invoice (Invoice Date = Current Date), which incorporates any charges with the next or before billing date.</li>
+    /// <li><i>InvoiceQuote</i> - The method will return an invoice object, which incorporates any charges with the next or before billing date, but these charges won't be saved into database.</li>
+    /// </ul>
+    /// </param>
+    /// <returns>Returns a reference to an invoice object which includes charges generated by this call.</returns>
     public Invoice Subscribe(Subscription subscription, InvoiceAction invoiceAction)
     {
       var subscribeAddress = new Uri(ServiceAddress, RestServiceSubscribe);
@@ -287,12 +302,19 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     }
 
     /// <summary>
-    /// Modify subscription. If error occurred, MetangaException should be raised
+    /// Modifies an existing subscription with the values supplied in the Subscription object passed in. The Unsubscribe and Change Quantity for Reservation product actions will be covered by the ModifySubscription method.  
+    /// By providing the End Date, the account will be unsubscribed. This method returns a reference to an invoice object.
     /// </summary>
-    /// <param name="subscription">Metanga subscription entity to Modify</param>
-    /// <param name="effectiveDate">Effective date for termination,</param>
-    /// <param name="invoiceAction">Invoice action.</param>
-    /// <returns>Metanga ID of newely created entity</returns>
+    /// <param name="subscription">Represents the subscription which will be created in the system by this call.</param>
+    /// <param name="invoiceAction">The purpose of this parameter is to indicate what invoice action will be taken. It can have the next values:
+    /// <ul>
+    /// <li><i>InvoiceNext</i> - The newly calculated charges will be placed into invoices with naturally billing dates. Metanga will leave all new invoices open, and will return an open invoice for the current billing period.</li>
+    /// <li><i>InvoiceNow</i> - The method will return a closed ad-hoc invoice (Invoice Date = Current Date), which incorporates any charges with the next or before billing date.</li>
+    /// <li><i>InvoiceQuote</i> - The method will return an invoice object, which incorporates any charges with the next or before billing date, but these charges won't be saved into database.</li>
+    /// </ul>
+    /// </param>
+    /// <param name="effectiveDate">This effective date will be used to determine when a quantity/unit change will become effective.</param>    
+    /// <returns>Returns a reference to an invoice object which includes charges generated by this call.</returns>
     public Invoice Modify(Subscription subscription, DateTime? effectiveDate, InvoiceAction invoiceAction)
     {
       var subscribeAddress = new Uri(ServiceAddress, RestServiceSubscribe);
@@ -328,6 +350,47 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     public Invoice Modify(Subscription subscription, DateTime? effectiveDate)
     {
       return Modify(subscription, effectiveDate, InvoiceAction.InvoiceNext);
+    }
+
+    ///<summary>
+    /// This method will create and / or update a collection of subscriptions. The charges calculated by each operation
+    /// will be aggregated into a single invoice.  
+    /// Method only accepts subscriptions with the same payer account.
+    /// </summary>
+    /// <param name="subscriptionOperations">A collection of operations to be processed</param>
+    /// <param name="effectiveDate">This effective date will be used to determine when a quantity/unit change will become effective (will be used when updating subscription).</param>
+    /// <param name="invoiceAction">The purpose of this parameter is to indicate what invoice action will be taken. It can have the next values:
+    /// <ul>
+    /// <li><i>InvoiceNext</i> - The newly calculated charges will be placed into invoices with naturally billing dates. Metanga will leave all new invoices open, and will return an open invoice for the current billing period.</li>
+    /// <li><i>InvoiceNow</i> - The method will return a closed ad-hoc invoice (Invoice Date = Current Date), which incorporates any charges with the next or before billing date.</li>
+    /// <li><i>InvoiceQuote</i> - The method will return an invoice object, which incorporates any charges with the next or before billing date, but these charges won't be saved into database.</li>
+    /// </ul>
+    /// </param>
+    /// <returns>Returns a reference to an invoice object which includes charges generated by this call.</returns>
+    public Invoice TransitionSubscription(IEnumerable<SubscriptionOperation> subscriptionOperations, DateTime? effectiveDate, InvoiceAction invoiceAction)
+    {
+      var transitionSubscriptionAddress = new Uri(ServiceAddress, RestServiceTransitionSubscription);
+
+      using (var credentialStream = new MemoryStream())
+      {
+        var subscriptionSerialized = SerializeContent(subscriptionOperations, credentialStream);
+        using (var httpClient = new HttpClient())
+        {
+          var dictionaryHeaders = new Dictionary<string, string> { { "X-Metanga-InvoiceAction", invoiceAction.ToString() } };
+          if (effectiveDate.HasValue)
+          {
+            var dateInIsoFormat = effectiveDate.Value.ToString("s", CultureInfo.InvariantCulture);
+            dictionaryHeaders.Add("X-Metanga-EffectiveDate", dateInIsoFormat);
+          }
+
+          PopulateMetangaHeaders(httpClient, null, dictionaryHeaders);
+
+          var response = httpClient.PostAsync(transitionSubscriptionAddress, subscriptionSerialized).Result;
+          CheckResponse(response, HttpStatusCode.Created);
+          var responseContent = response.Content.ReadAsStreamAsync().Result;
+          return DeserializeContent<Invoice>(responseContent);
+        }
+      }
     }
 
     /// <summary>
@@ -380,6 +443,40 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     }
     #endregion
 
+    #region RetieveStatement
+
+    ///<summary>
+    /// Retieve Balance Statement for a certain time range and account
+    ///</summary>
+    ///<param name="account">Account for which statement will be retrieved</param>
+    ///<param name="startDate">Date from which Statement will be calculated</param>
+    ///<param name="endDate">Date up to which Statement will be calculated</param>
+    /// <returns>KeyValue pair - currency : Statement object</returns>
+    public Dictionary<string, Statement> RetrieveStatement(Entity account, DateTime? startDate, DateTime? endDate)
+    {
+      using (var httpClient = new HttpClient())
+      {
+        var entityIdentificator = GetEntityIdentificator(account);
+        PopulateMetangaHeaders(httpClient, entityIdentificator.Value);
+        
+        var queryString = System.Web.HttpUtility.ParseQueryString(string.Empty);
+        if (startDate.HasValue)
+          queryString["startDateTime"] = startDate.Value.ToString("s", CultureInfo.InvariantCulture);
+        if (endDate.HasValue)
+          queryString["endDateTime"] = endDate.Value.ToString("s", CultureInfo.InvariantCulture);
+
+        var relativeUri = new Uri(RestServiceAccount + "/" + entityIdentificator.Key + "/statement" + (queryString.Count > 0 ? "?" + queryString : string.Empty), UriKind.Relative);
+
+        var serviceUri = new Uri(ServiceAddress, relativeUri);
+        var response = httpClient.GetAsync(serviceUri).Result;
+        CheckResponse(response, HttpStatusCode.OK);
+        var responseContent = response.Content.ReadAsStreamAsync().Result;
+        return DeserializeContent<Dictionary<string, Statement>>(responseContent);
+      }
+    }
+
+    #endregion
+
     /// <summary>
     /// <para><strong><font color="green">Please note, this is only beta-version of functionality. You should use it for testing purposes.</font></strong></para>
     /// By using this method, you are able to create a number of different entities in Metanga in one bulk operation.
@@ -391,10 +488,11 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       var enrollmentAddress = new Uri(ServiceAddress, RestServiceBulk);
       using (var credentialStream = new MemoryStream())
       {
-        var enrollParamsContent = SerializeContent(newEntities, credentialStream);
+        var entities = newEntities.ToList();
+        var enrollParamsContent = SerializeContentForBulk(entities, credentialStream);
         using (var httpClient = new HttpClient())
         {
-          var entityCount = newEntities.Count();
+          var entityCount = entities.Count;
           if (entityCount > 100) httpClient.Timeout = new TimeSpan(0, 0, entityCount); // for more than 100 entities, set a timeout that allows for 1 second
           PopulateMetangaHeaders(httpClient, null);
           var response = httpClient.PostAsync(enrollmentAddress, enrollParamsContent).Result;
@@ -404,6 +502,19 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         }
       }
     }
+
+    private StreamContent SerializeContentForBulk(IEnumerable<Entity> newEntities, Stream credentialStream)
+    {
+      if (ContentType == MetangaContentType.Json)
+      {
+        var entityCollection = new Collection<Entity>();
+        foreach (var entity in newEntities)
+          entityCollection.Add(entity);
+        return SerializeContent(entityCollection, credentialStream);
+      }
+      return SerializeContent(newEntities, credentialStream);
+    }
+
 
     /// <summary>
     /// <para><strong><font color="green">Please note, this is only beta-version of functionality. You should use it for testing purposes.</font></strong></para>
@@ -415,10 +526,11 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       var enrollmentAddress = new Uri(ServiceAddress, RestServiceBulk);
       using (var credentialStream = new MemoryStream())
       {
-        var enrollParamsContent = SerializeContent(newEntities, credentialStream);
+        var entities = newEntities.ToList();
+        var enrollParamsContent = SerializeContentForBulk(entities, credentialStream);
         using (var httpClient = new HttpClient())
         {
-          var entityCount = newEntities.Count();
+          var entityCount = entities.Count;
           if (entityCount > 100) httpClient.Timeout = new TimeSpan(0, 0, entityCount); // for more than 100 entities, set a timeout that allows for 1 second
           PopulateMetangaHeaders(httpClient, null);
           var response = httpClient.PutAsync(enrollmentAddress, enrollParamsContent).Result;
@@ -439,10 +551,11 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       using (var httpClient = new HttpClient())
       using (var entityStream = new MemoryStream())
       {
-        var entityCount = deletedEntities.Count();
+        var entities = deletedEntities.ToList();
+        var entityCount = entities.Count;
         if (entityCount > 100) httpClient.Timeout = new TimeSpan(0, 0, entityCount); // for more than 100 entities, set a timeout that allows for 1 second
         PopulateMetangaHeaders(httpClient, null);
-        var entityContent = SerializeContent(deletedEntities, entityStream);
+        var entityContent = SerializeContentForBulk(entities, entityStream);
         requestMessage.Content = entityContent;
         using (var response = httpClient.SendAsync(requestMessage).Result)
           CheckResponse(response, HttpStatusCode.OK);
@@ -516,15 +629,18 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       return RetrieveEntity<T>(TypeOfIdExternal, externalId);
     }
 
+
     /// <summary>
     /// <para><strong><font color="green">Please note, this is only beta-version of functionality. You should use it for testing purposes.</font></strong></para>
     /// By using this method, you are able to retrieve all the entities of a certain type in one bulk operetion.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
+    /// <param name="requestParameters">OData URI Query string which is used to determine filtering options</param>
     /// <returns>Collection of entities of a certain type.</returns>
-    public IEnumerable<T> RetrieveEntitiesBulk<T>() where T : Entity, new()
+    public IEnumerable<T> RetrieveEntitiesBulk<T>(string requestParameters) where T : Entity, new()
     {
-      var serviceUri = CombineUri(RestServiceBulk.ToString(), typeof(T).Name);
+      var typeName = ResolveBaseEntityType(typeof(T)).Name;
+      var serviceUri = CombineUri(string.Format(CultureInfo.InvariantCulture, "{0}?{1}", typeName, requestParameters));
       
       using (var httpClient = new HttpClient())
       {
@@ -539,13 +655,24 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
             case MetangaContentType.Json:
               return DeserializeContent<IEnumerable<T>>(responseContent);
             case MetangaContentType.Xml:
-              return DeserializeContent<IEnumerable<Entity>>(responseContent).Select(x=>x as T);
+              return DeserializeContent<IEnumerable<T>>(responseContent).Select(x=>x as T);
             default:
               throw new NotSupportedException();
           }
         }
       }
     }
+    /// <summary>
+    ///  <para><strong><font color="green">Please note, this is only beta-version of functionality. You should use it for testing purposes.</font></strong></para>
+    /// By using this method, you are able to retrieve all the entities of a certain type in one bulk operetion.
+    /// </summary>
+    /// <typeparam name="T">Entity type.</typeparam>
+    /// <returns>Collection of entities of a certain type.</returns>
+    public IEnumerable<T> RetrieveEntitiesBulk<T>() where T : Entity, new()
+    {
+      return RetrieveEntitiesBulk<T>(null);
+    }
+
     /// <summary>
     /// Close session
     /// </summary>
@@ -666,6 +793,13 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         uri.Append("/" + segment);
       var relativeUri = new Uri(uri.ToString(), UriKind.Relative);
       return new Uri(ServiceAddress, relativeUri);
+    }
+
+    private static Type ResolveBaseEntityType(Type type)
+    {
+      if (type.BaseType == null || type.BaseType == typeof(Entity) || type.BaseType == typeof(ExtensibleEntity) || type.BaseType == typeof(ManualPayment) || type.BaseType == typeof(Payment))
+        return type;
+      return ResolveBaseEntityType(type.BaseType);
     }
 
     #endregion
