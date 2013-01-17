@@ -80,7 +80,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       var stream = httpResponseMessage.Content.ReadAsStreamAsync().Result;
       var errorData = DeserializeContent<ErrorData>(stream);
       if (errorData.InnerErrors != null)
-        throw new MetangaAggregateException(errorData);
+        throw new MetangaAggregateException(errorData.ErrorMessage, errorData.ErrorId, errorData.InnerErrors);
 
       throw new MetangaException(errorData.ErrorMessage, errorData.ErrorId);
 

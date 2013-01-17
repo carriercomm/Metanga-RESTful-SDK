@@ -48,12 +48,18 @@ namespace Metanga.SoftwareDevelopmentKit
       : base(info, context)
     {
     }
-
-    public MetangaAggregateException(ErrorData errorData)
-      : base(errorData.ErrorMessage, errorData.ErrorId)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="errorId"></param>
+    /// <param name="innerErrors"></param>
+    public MetangaAggregateException(string message, Guid errorId, IEnumerable<ErrorData> innerErrors)
+      : base(message, errorId)
     {
+      if (innerErrors == null) throw new ArgumentNullException("innerErrors");
       Exceptions =
-        errorData.InnerErrors.Select(x => new KeyValuePair<Entity, MetangaException>(x.AssociatedEntity, new MetangaException(x.ErrorMessage, x.ErrorId)));
+        innerErrors.Select(x => new KeyValuePair<Entity, MetangaException>(x.AssociatedEntity, new MetangaException(x.ErrorMessage, x.ErrorId)));
     }
 
     /// <summary>
