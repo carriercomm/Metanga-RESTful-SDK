@@ -30,7 +30,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     private static readonly Uri RestServiceSubscribe = new Uri("RestService/subscribe", UriKind.Relative);
     private static readonly Uri RestServiceTransitionSubscription = new Uri("RestService/transitionSubscription", UriKind.Relative);
     private static readonly Uri RestServiceMeterUsageEvents = new Uri("RestService/meterusageevents", UriKind.Relative);
-    private static readonly Uri RestServiceElectronicPayment = new Uri("RestService/electronicpayment", UriKind.Relative);
+    private static readonly Uri RestServiceProcessElectronicPayment = new Uri("RestService/ProcessElectronicPayment", UriKind.Relative);
     private static readonly Uri RestServiceBulk = new Uri("RestService/bulk", UriKind.Relative);
     private static readonly Uri RestServiceAccount = new Uri("RestService/"+typeof(Account).Name, UriKind.Relative);
     private const string TypeOfIdMetanga = "Metanga";
@@ -426,7 +426,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     /// <returns></returns>
     public ElectronicPayment ProcessElectronicPayment(ElectronicPayment electronicPayment)
     {
-      var electronicPaymentAddress = new Uri(ServiceAddress, RestServiceElectronicPayment);
+      var electronicPaymentAddress = new Uri(ServiceAddress, RestServiceProcessElectronicPayment);
       using (var credentialStream = new MemoryStream())
       {
         var electronicPaymentParamsContent = SerializeContent(electronicPayment, credentialStream);
