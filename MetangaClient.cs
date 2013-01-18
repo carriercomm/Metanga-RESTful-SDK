@@ -80,7 +80,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       var stream = httpResponseMessage.Content.ReadAsStreamAsync().Result;
       var errorData = DeserializeContent<ErrorData>(stream);
       if (errorData.InnerErrors != null)
-        throw new MetangaAggregateException(errorData.ErrorMessage, errorData.ErrorId, errorData.InnerErrors);
+        throw new MetangaAggregateException(errorData);
 
       throw new MetangaException(errorData.ErrorMessage, errorData.ErrorId);
 
@@ -441,6 +441,30 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         }
       }
     }
+
+    /// <summary>
+    /// Retries the failed payment.
+    /// </summary>
+    /// <param name="electronicPayment">The entity, populated with Entity Id .</param>
+    /// <returns></returns>
+    public ElectronicPayment RetryFailedPayment(ElectronicPayment electronicPayment)
+    {
+      var electronicPaymentAddress = new Uri(ServiceAddress, RestServiceProcessElectronicPayment);
+      using (var credentialStream = new MemoryStream())
+      {
+        var electronicPaymentParamsContent = SerializeContent(electronicPayment, credentialStream);
+        using (var httpClient = new HttpClient())
+        {
+          PopulateMetangaHeaders(httpClient, null);
+
+          var response = httpClient.PutAsync(electronicPaymentAddress, electronicPaymentParamsContent).Result;
+          CheckResponse(response, HttpStatusCode.OK);
+          var responseContent = response.Content.ReadAsStreamAsync().Result;
+          return DeserializeContent<ElectronicPayment>(responseContent);
+        }
+      }
+    }
+
     #endregion
 
     #region RetieveStatement
