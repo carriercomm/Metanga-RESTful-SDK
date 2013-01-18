@@ -32,7 +32,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     private static readonly Uri RestServiceMeterUsageEvents = new Uri("RestService/meterusageevents", UriKind.Relative);
     private static readonly Uri RestServiceProcessElectronicPayment = new Uri("RestService/ProcessElectronicPayment", UriKind.Relative);
     private static readonly Uri RestServiceBulk = new Uri("RestService/bulk", UriKind.Relative);
-    private static readonly Uri RestServiceAccount = new Uri("RestService/"+typeof(Account).Name, UriKind.Relative);
+    private static readonly Uri RestServiceAccount = new Uri("RestService/" + typeof(Account).Name, UriKind.Relative);
     private const string TypeOfIdMetanga = "Metanga";
     private const string TypeOfIdExternal = "External";
 
@@ -80,12 +80,12 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       var stream = httpResponseMessage.Content.ReadAsStreamAsync().Result;
       var errorData = DeserializeContent<ErrorData>(stream);
       if (errorData.InnerErrors != null)
-        throw new MetangaAggregateException(errorData);
+        throw new MetangaAggregateException(errorData.ErrorMessage, errorData.ErrorId, errorData.InnerErrors);
 
       throw new MetangaException(errorData.ErrorMessage, errorData.ErrorId);
 
     }
-    
+
     private static JsonSerializer CreateJsonSerializer()
     {
       var jsonSerializerSettings = new JsonSerializerSettings();
@@ -120,7 +120,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       return streamContent;
     }
 
-    private static void SerializeToJson (object content, Stream entityStream)
+    private static void SerializeToJson(object content, Stream entityStream)
     {
       var jsonTextWriter = new JsonTextWriter(new StreamWriter(entityStream, Encoding)) { CloseOutput = false };
       JsonSerializer.Serialize(jsonTextWriter, content);
@@ -131,10 +131,10 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     {
       var isEntity = content is Entity;
       Type type;
-      if (isEntity) 
-        type = typeof (Entity);
+      if (isEntity)
+        type = typeof(Entity);
       else if (content is IEnumerable<Entity>)
-        type = typeof (IEnumerable<Entity>);
+        type = typeof(IEnumerable<Entity>);
       else
         type = content.GetType();
       var serializer = new DataContractSerializer(type);
@@ -221,7 +221,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     /// <summary>
     /// REST content type (JSON, XML)
     /// </summary>
-    private  MetangaContentType ContentType { get; set; }
+    private MetangaContentType ContentType { get; set; }
 
     #endregion
 
@@ -244,7 +244,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     public Invoice Enroll(Subscription subscription, Account account, InvoiceAction invoiceAction)
     {
       var enrollmentAddress = new Uri(ServiceAddress, RestServiceEnrollment);
-      var enrollParams = new  EnrollParameters {Subscription = subscription, Account = account};
+      var enrollParams = new EnrollParameters { Subscription = subscription, Account = account };
       using (var credentialStream = new MemoryStream())
       {
         var enrollParamsContent = SerializeContent(enrollParams, credentialStream);
@@ -318,17 +318,17 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     public Invoice Modify(Subscription subscription, DateTime? effectiveDate, InvoiceAction invoiceAction)
     {
       var subscribeAddress = new Uri(ServiceAddress, RestServiceSubscribe);
-      
+
       using (var credentialStream = new MemoryStream())
       {
         var subscriptionSerialized = SerializeContent(subscription, credentialStream);
         using (var httpClient = new HttpClient())
         {
-          var dictionaryHeaders = new Dictionary<string, string> {{"X-Metanga-InvoiceAction", invoiceAction.ToString()}};
+          var dictionaryHeaders = new Dictionary<string, string> { { "X-Metanga-InvoiceAction", invoiceAction.ToString() } };
           if (effectiveDate.HasValue)
           {
             var dateInIsoFormat = effectiveDate.Value.ToString("s", CultureInfo.InvariantCulture);
-            dictionaryHeaders.Add("X-Metanga-EffectiveDate", dateInIsoFormat); 
+            dictionaryHeaders.Add("X-Metanga-EffectiveDate", dateInIsoFormat);
           }
 
           PopulateMetangaHeaders(httpClient, null, dictionaryHeaders);
@@ -464,7 +464,6 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         }
       }
     }
-
     #endregion
 
     #region RetieveStatement
@@ -482,7 +481,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       {
         var entityIdentificator = GetEntityIdentificator(account);
         PopulateMetangaHeaders(httpClient, entityIdentificator.Value);
-        
+
         var queryString = System.Web.HttpUtility.ParseQueryString(string.Empty);
         if (startDate.HasValue)
           queryString["startDateTime"] = startDate.Value.ToString("s", CultureInfo.InvariantCulture);
@@ -571,7 +570,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     public void DeleteEntityBulk(IEnumerable<Entity> deletedEntities)
     {
       var serviceUri = new Uri(ServiceAddress, RestServiceBulk);
-      using(var requestMessage = new HttpRequestMessage(HttpMethod.Delete, serviceUri))
+      using (var requestMessage = new HttpRequestMessage(HttpMethod.Delete, serviceUri))
       using (var httpClient = new HttpClient())
       using (var entityStream = new MemoryStream())
       {
@@ -585,7 +584,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
           CheckResponse(response, HttpStatusCode.OK);
       }
     }
-    
+
     /// <summary>
     /// Create an entity to database and return EntityId. If error occurred, MetangaException should be raised
     /// </summary>
@@ -612,7 +611,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       using (var response = ProcessEntity(entity, (httpClient, serviceUri, messageContent) => httpClient.PutAsync(serviceUri, messageContent)))
         CheckResponse(response, HttpStatusCode.OK);
     }
-    
+
     /// <summary>
     /// Delete an entity from database. If error occurred,  MetangaException should be raised
     /// </summary>
@@ -630,7 +629,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
           CheckResponse(response, HttpStatusCode.OK);
       }
     }
-    
+
     /// <summary>
     /// Retrieve an entity by EntityId from database. If error occurred,  MetangaException should be raised
     /// </summary>
@@ -665,7 +664,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     {
       var typeName = ResolveBaseEntityType(typeof(T)).Name;
       var serviceUri = CombineUri(string.Format(CultureInfo.InvariantCulture, "{0}?{1}", typeName, requestParameters));
-      
+
       using (var httpClient = new HttpClient())
       {
         PopulateMetangaHeaders(httpClient, null);
@@ -679,7 +678,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
             case MetangaContentType.Json:
               return DeserializeContent<IEnumerable<T>>(responseContent);
             case MetangaContentType.Xml:
-              return DeserializeContent<IEnumerable<T>>(responseContent).Select(x=>x as T);
+              return DeserializeContent<IEnumerable<T>>(responseContent).Select(x => x as T);
             default:
               throw new NotSupportedException();
           }
@@ -704,13 +703,13 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     {
       //TODO: there is a strange error. We have to commnet it for now
       //Error Message: Metanga.SoftwareDevelopmentKit.Rest.MetangaException: Session verification failed. Session 81452fcf-013a-2bbc-cd94-4d68b1ecc977 has expired.
-//      using (var httpClient = new HttpClient())
-//      {
-//        PopulateMetangaHeader(httpClient, TypeOfIdExternal);
-//        var serviceUri = new Uri(ServiceAddress, RestServiceSession);
-//        using (var response = httpClient.DeleteAsync(serviceUri).Result)
-//          CheckResponse(response, HttpStatusCode.OK);
-//      }
+      //      using (var httpClient = new HttpClient())
+      //      {
+      //        PopulateMetangaHeader(httpClient, TypeOfIdExternal);
+      //        var serviceUri = new Uri(ServiceAddress, RestServiceSession);
+      //        using (var response = httpClient.DeleteAsync(serviceUri).Result)
+      //          CheckResponse(response, HttpStatusCode.OK);
+      //      }
       SessionId = Guid.Empty;
     }
 
@@ -721,7 +720,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     private Guid CreateSession()
     {
       var sessionAddress = new Uri(ServiceAddress, RestServiceSession);
-      var credentials = new PasswordCredential {Password = Password, UserName = UserName};
+      var credentials = new PasswordCredential { Password = Password, UserName = UserName };
       using (var httpClient = new HttpClient())
       {
         using (var credentialStream = new MemoryStream())
@@ -757,7 +756,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       httpClient.DefaultRequestHeaders.Add("X-Metanga-SessionId", SessionId.ToString());
       if (!string.IsNullOrEmpty(typeId))
         httpClient.DefaultRequestHeaders.Add("X-Metanga-ReferenceType", typeId);
-      
+
       //Populate Accept header
       httpClient.DefaultRequestHeaders.Accept.Clear();
       httpClient.DefaultRequestHeaders.Accept.Add(_contentFormatHeader);
@@ -793,7 +792,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
           case MetangaContentType.Json:
             {
               var jsonTextReader = new JsonTextReader(streamReader);
-              return (T) JsonSerializer.Deserialize(jsonTextReader, typeof (T));
+              return (T)JsonSerializer.Deserialize(jsonTextReader, typeof(T));
             }
           case MetangaContentType.Xml:
             {
@@ -840,8 +839,8 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
 
     public override Type BindToType(string assemblyName, string typeName)
     {
-      if(!string.IsNullOrEmpty(typeName))
-        typeName = typeName.Replace("metanga.com.", AssemblyName+".Proxy.");
+      if (!string.IsNullOrEmpty(typeName))
+        typeName = typeName.Replace("metanga.com.", AssemblyName + ".Proxy.");
       return base.BindToType(AssemblyName, typeName);
     }
 
