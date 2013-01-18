@@ -162,6 +162,9 @@ namespace Metanga.Example
       PrintConsoleMessage("Running Create Reverse operation for Electronic payment Example...");
       client.ProcessElectronicPayment(electronicPaymentReverse);
 
+      PrintConsoleMessage("Running Retry Failed Payment Example...");
+      //var retryElectronicPayment = new ElectronicPayment {EntityId = Guid.Empty};//Set failed payment EntityId
+      //retryElectronicPayment = client.RetryFailedPayment(retryElectronicPayment);
 
       PrintConsoleMessage("Closing connection to Metanga...");
       CloseMetangaClient(client);
