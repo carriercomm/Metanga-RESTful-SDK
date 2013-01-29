@@ -85,7 +85,7 @@ namespace Metanga.Example
         PrintConsoleMessage(String.Format("An error has occurred during entity update: Id={0}, Message={1}", e.ErrorId, e.Message));
         foreach (var childException in e.Exceptions)
         {
-          PrintConsoleMessage(String.Format("Entity {0} had the following error: {1}", childException.Key.ExternalId, childException.Value.Message));
+          PrintConsoleMessage(String.Format("Entity {0} had the following error: {1}", childException.EntityReference.ExternalId, childException.Error.Message));
         }
       }
       if (!isErrorOccurred)
