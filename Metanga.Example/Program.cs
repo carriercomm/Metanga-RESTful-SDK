@@ -62,6 +62,22 @@ namespace Metanga.Example
         return;
       }
 
+      PrintConsoleMessage("Running SmartProduct with tier Creation Example...");
+     
+      var externalChildProductId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+      var child = CreateChildProduct(externalChildProductId);
+      var childproductId = CreateEntityExample(client, child);
+
+      var externalSmartProductId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+      var product = CreateSmartProductTier(externalSmartProductId, externalChildProductId);
+      var productId = CreateEntityExample(client, product);
+      if (productId == null)
+      {
+        EndExample();
+        return;
+      }
+
+
       PrintConsoleMessage("Running Package Creation Example...");
       var externalPackageId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
       var package = CreatePackage(externalPackageId, externalProductId + "-00"); // the "00" is to use the first pair of products created
@@ -352,6 +368,51 @@ namespace Metanga.Example
         UnitGroup = null
       };
     }
+
+    private static SampleProduct CreateChildProduct(string externalProductId)
+    {
+      return new SampleProduct
+      {
+        ExternalId = externalProductId,
+        Name = new Dictionary<string, string>
+                                    {{"en-us", externalProductId}},
+        Taxable = true,
+        TimeBased = false,
+        UnitGroup = null,
+        TierQuantity = "111"
+      };
+   }
+
+    private static SampleProduct CreateSmartProductTier(string externalSmartProductId,string externalProductId)
+    {
+      // Create a Smart Product for Cloud Storage. 
+      return new SampleProduct
+      {
+        ExternalId = externalSmartProductId,
+        Name = new Dictionary<string, string> { { "en-us", externalSmartProductId } },
+        TimeBased = false,
+        ProductModel = new TierModel
+           {
+             DefaultProduct = new Product { ExternalId = externalProductId },
+             Tiers = new[]
+                  {
+                     new Tier
+                       {
+                         Capacity = 10,
+                         Product = new Product {ExternalId = externalProductId}
+                        },
+                         new Tier
+                       {
+                         Capacity = 134,
+                         Product = new Product {ExternalId = externalProductId}
+                        }
+                  }
+           }
+      
+      };
+    }
+
+
 
     private static SamplePackage CreatePackage(string externalPackageId, string externalProductId)
     {
