@@ -228,6 +228,34 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     #region Public methods
 
     /// <summary>
+    /// Retrieves all the packages associated with a specific promotion code.
+    /// </summary>
+    /// <param name="promoCode">Represents the promotion code used to filter packages returned.</param>
+    /// <param name="enrollmentDate">Represents the date on which the enrollment occurs.</param>
+    /// <returns>Returns a collection of packages</returns>
+    public IEnumerable<Package> GetPackagesByPromotionCode(string promoCode, DateTime? enrollmentDate)
+    {
+      if (String.IsNullOrEmpty(promoCode)) throw new ArgumentNullException("promoCode");
+
+      using (var httpClient = new HttpClient())
+      {
+        PopulateMetangaHeaders(httpClient, null);
+        var queryString = System.Web.HttpUtility.ParseQueryString(string.Empty);
+        queryString["promoCode"] = promoCode;
+        if (enrollmentDate.HasValue)
+          queryString["enrollmentDate"] = enrollmentDate.Value.ToString("s", CultureInfo.InvariantCulture);
+
+        var relativeUri = new Uri(RestServiceEnrollment + "?" + queryString, UriKind.Relative);
+
+        var serviceUri = new Uri(ServiceAddress, relativeUri);
+        var response = httpClient.GetAsync(serviceUri).Result;
+        CheckResponse(response, HttpStatusCode.OK);
+        var responseContent = response.Content.ReadAsStreamAsync().Result;
+        return DeserializeContent<IEnumerable<Package>>(responseContent);
+      }
+    }
+
+    /// <summary>
     /// Takes a Subscription object and an Account object as a parameter and based on the values populated in this object it first creates a new account and then subscribes this account to a specified package. 
     /// This method returns a reference to an invoice object.
     /// </summary>
