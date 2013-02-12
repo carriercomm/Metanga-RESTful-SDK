@@ -725,6 +725,25 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     }
 
     /// <summary>
+    /// Retrieve an units of measure by unit code from database. If error occurred,  MetangaException should be raised.
+    /// </summary>
+    /// <param name="UnitCode">Unit code</param>
+    /// <returns>Unit of measure.</returns>
+    public UnitOfMeasure RetrieveUnit(string UnitCode)
+    {
+      return RetrieveClass<UnitOfMeasure>(TypeOfIdExternal, UnitCode);
+    }
+
+    /// <summary>
+    /// By using this method, you are able to retrieve all units of measure from database.
+    /// </summary>
+    /// <returns>Collection of units of measure.</returns>
+    public IEnumerable<UnitOfMeasure> RetrieveUnits()
+    {
+      var serviceUri = CombineUri(typeof(UnitOfMeasure).Name, null);
+      return RetrieveClass<IEnumerable<UnitOfMeasure>>(TypeOfIdExternal, serviceUri);
+    }
+    /// <summary>
     /// Close session
     /// </summary>
     public void Close()
@@ -798,6 +817,27 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     {
       var serviceUri = CombineUri(typeof(T).Name, value);
 
+      using (var httpClient = new HttpClient())
+      {
+        PopulateMetangaHeaders(httpClient, typeOfId);
+        using (var result = httpClient.GetAsync(serviceUri))
+        {
+          var response = result.Result;
+          CheckResponse(response, HttpStatusCode.OK);
+          var stream = response.Content.ReadAsStreamAsync().Result;
+          return DeserializeContent<T>(stream);
+        }
+      }
+    }
+
+    private T RetrieveClass<T>(string typeOfId, string value)
+    {
+      var serviceUri = CombineUri(typeof(T).Name, value);
+      return RetrieveClass<T>(typeOfId, serviceUri);
+    }
+
+    private T RetrieveClass<T>(string typeOfId, Uri serviceUri)
+    {
       using (var httpClient = new HttpClient())
       {
         PopulateMetangaHeaders(httpClient, typeOfId);
