@@ -66,7 +66,7 @@ namespace Metanga.Example
      
       var externalChildProductId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
       var child = CreateChildProduct(externalChildProductId);
-      var childproductId = CreateEntityExample(client, child);
+      CreateEntityExample(client, child);
 
       var externalSmartProductId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
       var product = CreateSmartProductTier(externalSmartProductId, externalChildProductId);
@@ -108,8 +108,13 @@ namespace Metanga.Example
       {
         EndExample();
         return;
-      }
-
+      } 
+      
+      //Retrieving Unit of Measure
+      PrintConsoleMessage("Running Retrieving Unit of Measure Minute Example...");
+     var unit=client.RetrieveUnit("Min");
+     PrintConsoleMessage(String.Format("Unit of Measue {0} has a base unit: {1} and convertion:{2}", unit.UnitCode, unit.BaseUnitCode, unit.BaseUnitConversion));
+     
       PrintConsoleMessage("Running Enrollment Example...");
       var subscription = EnrollmentExample(client, externalPackageId, externalProductId + "-00");
 
