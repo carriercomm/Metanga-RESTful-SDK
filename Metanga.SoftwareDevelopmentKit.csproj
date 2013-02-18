@@ -86,6 +86,9 @@
     <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.Account.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.BillingCycle.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.ElectronicPayment.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -102,6 +105,9 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.Statement.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\Proxy\Metanga.SoftwareDevelopmentKit.Proxy.UnitOfMeasure.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\Proxy\Metanga.wsdl" />

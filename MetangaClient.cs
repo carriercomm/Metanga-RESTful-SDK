@@ -727,11 +727,11 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     /// <summary>
     /// Retrieve an units of measure by unit code from database. If error occurred,  MetangaException should be raised.
     /// </summary>
-    /// <param name="UnitCode">Unit code</param>
+    /// <param name="unitCode">Unit code</param>
     /// <returns>Unit of measure.</returns>
-    public UnitOfMeasure RetrieveUnit(string UnitCode)
+    public UnitOfMeasure RetrieveUnit(string unitCode)
     {
-      return RetrieveClass<UnitOfMeasure>(TypeOfIdExternal, UnitCode);
+      return RetrieveClass<UnitOfMeasure>(TypeOfIdExternal, unitCode);
     }
 
     /// <summary>
@@ -743,6 +743,17 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       var serviceUri = CombineUri(typeof(UnitOfMeasure).Name, null);
       return RetrieveClass<IEnumerable<UnitOfMeasure>>(TypeOfIdExternal, serviceUri);
     }
+
+    /// <summary>
+    /// By using this method, you are able to retrieve all units of measure from database.
+    /// </summary>
+    /// <returns>Collection of billing cycles.</returns>
+    public IEnumerable<BillingCycle> RetrieveBillingCycles()
+    {
+      var serviceUri = CombineUri(typeof(BillingCycle).Name, null);
+      return RetrieveClass<IEnumerable<BillingCycle>>(TypeOfIdExternal, serviceUri);
+    }
+
     /// <summary>
     /// Close session
     /// </summary>
