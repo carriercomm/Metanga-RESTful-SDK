@@ -386,48 +386,6 @@
         <xsd:sequence />
       </xsd:complexType>
       <xsd:element name="ProductModel" nillable="true" type="tns:ProductModel" />
-      <xsd:complexType name="BucketGroupModel">
-        <xsd:complexContent mixed="false">
-          <xsd:extension base="tns:ProductModel">
-            <xsd:sequence>
-              <xsd:element minOccurs="0" name="Buckets" nillable="true" type="tns:ArrayOfBucket">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="DefaultProduct" nillable="true" type="tns:Product">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-            </xsd:sequence>
-          </xsd:extension>
-        </xsd:complexContent>
-      </xsd:complexType>
-      <xsd:element name="BucketGroupModel" nillable="true" type="tns:BucketGroupModel" />
-      <xsd:complexType name="ArrayOfBucket">
-        <xsd:sequence>
-          <xsd:element minOccurs="0" maxOccurs="unbounded" name="Bucket" nillable="true" type="tns:Bucket" />
-        </xsd:sequence>
-      </xsd:complexType>
-      <xsd:element name="ArrayOfBucket" nillable="true" type="tns:ArrayOfBucket" />
-      <xsd:complexType name="Bucket">
-        <xsd:sequence>
-          <xsd:element minOccurs="0" name="Capacity" type="xsd:decimal" />
-          <xsd:element minOccurs="0" name="Product" nillable="true" type="tns:Product">
-            <xsd:annotation>
-              <xsd:appinfo>
-                <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-              </xsd:appinfo>
-            </xsd:annotation>
-          </xsd:element>
-        </xsd:sequence>
-      </xsd:complexType>
-      <xsd:element name="Bucket" nillable="true" type="tns:Bucket" />
       <xsd:complexType name="TierModel">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:ProductModel">
@@ -470,6 +428,48 @@
         </xsd:sequence>
       </xsd:complexType>
       <xsd:element name="Tier" nillable="true" type="tns:Tier" />
+      <xsd:complexType name="BucketGroupModel">
+        <xsd:complexContent mixed="false">
+          <xsd:extension base="tns:ProductModel">
+            <xsd:sequence>
+              <xsd:element minOccurs="0" name="Buckets" nillable="true" type="tns:ArrayOfBucket">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="DefaultProduct" nillable="true" type="tns:Product">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:extension>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:element name="BucketGroupModel" nillable="true" type="tns:BucketGroupModel" />
+      <xsd:complexType name="ArrayOfBucket">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="Bucket" nillable="true" type="tns:Bucket" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="ArrayOfBucket" nillable="true" type="tns:ArrayOfBucket" />
+      <xsd:complexType name="Bucket">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="Capacity" type="xsd:decimal" />
+          <xsd:element minOccurs="0" name="Product" nillable="true" type="tns:Product">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="Bucket" nillable="true" type="tns:Bucket" />
       <xsd:complexType name="UnitGroup">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:Entity">
@@ -1675,13 +1675,6 @@
       <xsd:element name="ArrayOfEntityTypeColumn" nillable="true" type="tns:ArrayOfEntityTypeColumn" />
       <xsd:complexType name="EntityTypeColumn">
         <xsd:sequence>
-          <xsd:element minOccurs="0" name="ColumnNumber" type="xsd:int">
-            <xsd:annotation>
-              <xsd:appinfo>
-                <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-              </xsd:appinfo>
-            </xsd:annotation>
-          </xsd:element>
           <xsd:element minOccurs="0" name="DataType" type="tns:DataType" />
           <xsd:element minOccurs="0" name="DataTypeConfiguration" nillable="true" type="xsd:string">
             <xsd:annotation>
@@ -1954,14 +1947,6 @@
         <xsd:sequence />
       </xsd:complexType>
       <xsd:element name="AuthenticationConfiguration" nillable="true" type="tns:AuthenticationConfiguration" />
-      <xsd:complexType name="ClientCertificateConfiguration">
-        <xsd:complexContent mixed="false">
-          <xsd:extension base="tns:AuthenticationConfiguration">
-            <xsd:sequence />
-          </xsd:extension>
-        </xsd:complexContent>
-      </xsd:complexType>
-      <xsd:element name="ClientCertificateConfiguration" nillable="true" type="tns:ClientCertificateConfiguration" />
       <xsd:complexType name="OAuthWebServerConsumerConfiguration">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:AuthenticationConfiguration">
@@ -2048,6 +2033,14 @@
         </xsd:complexContent>
       </xsd:complexType>
       <xsd:element name="OAuthWebServerConsumerConfiguration" nillable="true" type="tns:OAuthWebServerConsumerConfiguration" />
+      <xsd:complexType name="ClientCertificateConfiguration">
+        <xsd:complexContent mixed="false">
+          <xsd:extension base="tns:AuthenticationConfiguration">
+            <xsd:sequence />
+          </xsd:extension>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:element name="ClientCertificateConfiguration" nillable="true" type="tns:ClientCertificateConfiguration" />
       <xsd:complexType name="NotificationEndpointConfiguration">
         <xsd:sequence>
           <xsd:element minOccurs="0" name="EndpointAddress" nillable="true" type="xsd:string">
@@ -2060,41 +2053,11 @@
         </xsd:sequence>
       </xsd:complexType>
       <xsd:element name="NotificationEndpointConfiguration" nillable="true" type="tns:NotificationEndpointConfiguration" />
-      <xsd:complexType name="RestfulNotificationConfiguration">
-        <xsd:complexContent mixed="false">
-          <xsd:extension base="tns:NotificationEndpointConfiguration">
-            <xsd:sequence>
-              <xsd:element minOccurs="0" name="ContentFormat" type="tns:RESTfulContentFormat">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element xmlns:q10="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="CustomHeaders" nillable="true" type="q10:ArrayOfKeyValueOfstringstring">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-            </xsd:sequence>
-          </xsd:extension>
-        </xsd:complexContent>
-      </xsd:complexType>
-      <xsd:element name="RestfulNotificationConfiguration" nillable="true" type="tns:RestfulNotificationConfiguration" />
-      <xsd:simpleType name="RESTfulContentFormat">
-        <xsd:restriction base="xsd:string">
-          <xsd:enumeration value="Json" />
-          <xsd:enumeration value="Xml" />
-        </xsd:restriction>
-      </xsd:simpleType>
-      <xsd:element name="RESTfulContentFormat" nillable="true" type="tns:RESTfulContentFormat" />
       <xsd:complexType name="SoapNotificationConfiguration">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:NotificationEndpointConfiguration">
             <xsd:sequence>
-              <xsd:element xmlns:q11="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="CustomHeaders" nillable="true" type="q11:ArrayOfKeyValueOfstringstring">
+              <xsd:element xmlns:q10="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="CustomHeaders" nillable="true" type="q10:ArrayOfKeyValueOfstringstring">
                 <xsd:annotation>
                   <xsd:appinfo>
                     <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
@@ -2113,6 +2076,36 @@
         </xsd:complexContent>
       </xsd:complexType>
       <xsd:element name="SoapNotificationConfiguration" nillable="true" type="tns:SoapNotificationConfiguration" />
+      <xsd:complexType name="RestfulNotificationConfiguration">
+        <xsd:complexContent mixed="false">
+          <xsd:extension base="tns:NotificationEndpointConfiguration">
+            <xsd:sequence>
+              <xsd:element minOccurs="0" name="ContentFormat" type="tns:RESTfulContentFormat">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element xmlns:q11="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="CustomHeaders" nillable="true" type="q11:ArrayOfKeyValueOfstringstring">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:extension>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:element name="RestfulNotificationConfiguration" nillable="true" type="tns:RestfulNotificationConfiguration" />
+      <xsd:simpleType name="RESTfulContentFormat">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Json" />
+          <xsd:enumeration value="Xml" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:element name="RESTfulContentFormat" nillable="true" type="tns:RESTfulContentFormat" />
       <xsd:complexType name="BinaryExpression">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:Expression">
@@ -2142,16 +2135,6 @@
         </xsd:restriction>
       </xsd:simpleType>
       <xsd:element name="BinaryOperator" nillable="true" type="tns:BinaryOperator" />
-      <xsd:complexType name="ConstantExpression">
-        <xsd:complexContent mixed="false">
-          <xsd:extension base="tns:Expression">
-            <xsd:sequence>
-              <xsd:element minOccurs="0" name="Value" nillable="true" type="xsd:anyType" />
-            </xsd:sequence>
-          </xsd:extension>
-        </xsd:complexContent>
-      </xsd:complexType>
-      <xsd:element name="ConstantExpression" nillable="true" type="tns:ConstantExpression" />
       <xsd:complexType name="PropertyExpression">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:Expression">
@@ -2162,6 +2145,16 @@
         </xsd:complexContent>
       </xsd:complexType>
       <xsd:element name="PropertyExpression" nillable="true" type="tns:PropertyExpression" />
+      <xsd:complexType name="ConstantExpression">
+        <xsd:complexContent mixed="false">
+          <xsd:extension base="tns:Expression">
+            <xsd:sequence>
+              <xsd:element minOccurs="0" name="Value" nillable="true" type="xsd:anyType" />
+            </xsd:sequence>
+          </xsd:extension>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:element name="ConstantExpression" nillable="true" type="tns:ConstantExpression" />
       <xsd:element name="CreateSession">
         <xsd:complexType>
           <xsd:sequence>
