@@ -3309,7 +3309,7 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
         public Metanga.SoftwareDevelopmentKit.Proxy.ProductModel UsedProductModel {
             get {
                 return this.UsedProductModelField;
