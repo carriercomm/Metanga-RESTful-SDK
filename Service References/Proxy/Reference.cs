@@ -3245,7 +3245,7 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
         private Metanga.SoftwareDevelopmentKit.Proxy.Product ProductField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private Metanga.SoftwareDevelopmentKit.Proxy.ProductModel UsedProductModelField;
+        private Metanga.SoftwareDevelopmentKit.Proxy.ProductModel ProductModelField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -3310,14 +3310,14 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
-        public Metanga.SoftwareDevelopmentKit.Proxy.ProductModel UsedProductModel {
+        public Metanga.SoftwareDevelopmentKit.Proxy.ProductModel ProductModel {
             get {
-                return this.UsedProductModelField;
+                return this.ProductModelField;
             }
             set {
-                if ((object.ReferenceEquals(this.UsedProductModelField, value) != true)) {
-                    this.UsedProductModelField = value;
-                    this.RaisePropertyChanged("UsedProductModel");
+                if ((object.ReferenceEquals(this.ProductModelField, value) != true)) {
+                    this.ProductModelField = value;
+                    this.RaisePropertyChanged("ProductModel");
                 }
             }
         }

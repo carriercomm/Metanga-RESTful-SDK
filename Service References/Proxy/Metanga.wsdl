@@ -276,7 +276,7 @@
           <xsd:element minOccurs="0" name="Optional" type="xsd:boolean" />
           <xsd:element minOccurs="0" name="PriceSchedule" nillable="true" type="tns:PriceSchedule" />
           <xsd:element minOccurs="0" name="Product" nillable="true" type="tns:Product" />
-          <xsd:element minOccurs="0" name="UsedProductModel" nillable="true" type="tns:ProductModel">
+          <xsd:element minOccurs="0" name="ProductModel" nillable="true" type="tns:ProductModel">
             <xsd:annotation>
               <xsd:appinfo>
                 <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />

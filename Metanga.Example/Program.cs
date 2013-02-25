@@ -64,10 +64,7 @@ namespace Metanga.Example
 
       PrintConsoleMessage("Running SmartProduct with tier Creation Example...");
      
-      var externalChildProductId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
-      var child = CreateChildProduct(externalChildProductId);
-      CreateEntityExample(client, child);
-
+      var externalChildProductId = CreateChildProduct(client);
       var externalSmartProductId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
       var product = CreateSmartProductTier(externalSmartProductId, externalChildProductId);
       var productId = CreateEntityExample(client, product);
@@ -80,7 +77,8 @@ namespace Metanga.Example
 
       PrintConsoleMessage("Running Package Creation Example...");
       var externalPackageId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
-      var package = CreatePackage(externalPackageId, externalProductId + "-00"); // the "00" is to use the first pair of products created
+      var smartExternalProductId = CreateChildProduct(client);
+      var package = CreatePackage(externalPackageId, externalProductId + "-00", smartExternalProductId); // the "00" is to use the first pair of products created
       var packageId = CreateEntityExample(client, package);
       if (packageId == null)
       {
@@ -374,19 +372,22 @@ namespace Metanga.Example
       };
     }
 
-    private static SampleProduct CreateChildProduct(string externalProductId)
+    private static string CreateChildProduct(MetangaClient client)
     {
-      return new SampleProduct
-      {
-        ExternalId = externalProductId,
-        Name = new Dictionary<string, string>
-                                    {{"en-us", externalProductId}},
-        Taxable = true,
-        TimeBased = false,
-        UnitGroup = null,
-        TierQuantity = "111"
-      };
-   }
+      var externalProductId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+
+      var childProduct = new SampleProduct
+                           {
+                             ExternalId = externalProductId,
+                             Name = new Dictionary<string, string> {{"en-us", externalProductId}},
+                             Taxable = true,
+                             TimeBased = false,
+                             UnitGroup = null,
+                             TierQuantity = "111"
+                           };
+      CreateEntityExample(client, childProduct);
+      return childProduct.ExternalId;
+    }
 
     private static SampleProduct CreateSmartProductTier(string externalSmartProductId,string externalProductId)
     {
@@ -419,7 +420,7 @@ namespace Metanga.Example
 
 
 
-    private static SamplePackage CreatePackage(string externalPackageId, string externalProductId)
+    private static SamplePackage CreatePackage(string externalPackageId, string externalProductId, string smartProductExternalid)
     {
       // Create a Package to bill for Cloud Storage. This is a special package with a discounted price of $0.09 / Gigabyte / Month
 
@@ -437,13 +438,32 @@ namespace Metanga.Example
         PriceSchedule = CreatePriceSchedule(0.005m, "1", null)
       };
 
+      var product = new Product {ExternalId = smartProductExternalid};
+      var smartPackageProduct = new PackageProduct
+                                  {
+                                    Product = product,
+                                    ProductModel = new BucketGroupModel
+                                                     {
+                                                       DefaultProduct = product,
+                                                       Buckets = new[]
+                                                                   {
+                                                                     new Bucket
+                                                                       {
+                                                                         Capacity = 10,
+                                                                         Product = product
+                                                                       }
+                                                                   }
+                                                     }
+                                  };
+
+
       return new SamplePackage
       {
         ExternalId = externalPackageId,
         Name = new Dictionary<string, string> { { "en-us", externalPackageId } },
         AdvanceRecurringEvents = true,
         RecurringChargeCycle = new [] { "MO" },
-        PackageProducts = new [] { reservationPackageProduct, usagePackageProduct }
+        PackageProducts = new[] { reservationPackageProduct, usagePackageProduct, smartPackageProduct },
       };
     }
 
