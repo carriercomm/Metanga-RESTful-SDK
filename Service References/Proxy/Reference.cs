@@ -569,6 +569,22 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
     [System.Runtime.Serialization.DataContractAttribute(Name="UnitGroup", Namespace="http://metanga.com")]
     [System.SerializableAttribute()]
     public partial class UnitGroup : Metanga.SoftwareDevelopmentKit.Proxy.Entity {
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string[] UnitsField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string[] Units {
+            get {
+                return this.UnitsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.UnitsField, value) != true)) {
+                    this.UnitsField = value;
+                    this.RaisePropertyChanged("Units");
+                }
+            }
+        }
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3411,8 +3427,8 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="ProductModel", Namespace="http://metanga.com")]
     [System.SerializableAttribute()]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.BucketGroupModel))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.TierModel))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.BucketGroupModel))]
     public partial class ProductModel : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
@@ -3578,45 +3594,6 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="BucketGroupModel", Namespace="http://metanga.com")]
-    [System.SerializableAttribute()]
-    public partial class BucketGroupModel : Metanga.SoftwareDevelopmentKit.Proxy.ProductModel {
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private Metanga.SoftwareDevelopmentKit.Proxy.Bucket[] BucketsField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private Metanga.SoftwareDevelopmentKit.Proxy.Product DefaultProductField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
-        public Metanga.SoftwareDevelopmentKit.Proxy.Bucket[] Buckets {
-            get {
-                return this.BucketsField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.BucketsField, value) != true)) {
-                    this.BucketsField = value;
-                    this.RaisePropertyChanged("Buckets");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
-        public Metanga.SoftwareDevelopmentKit.Proxy.Product DefaultProduct {
-            get {
-                return this.DefaultProductField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.DefaultProductField, value) != true)) {
-                    this.DefaultProductField = value;
-                    this.RaisePropertyChanged("DefaultProduct");
-                }
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="TierModel", Namespace="http://metanga.com")]
     [System.SerializableAttribute()]
     public partial class TierModel : Metanga.SoftwareDevelopmentKit.Proxy.ProductModel {
@@ -3656,9 +3633,48 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Bucket", Namespace="http://metanga.com")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="BucketGroupModel", Namespace="http://metanga.com")]
     [System.SerializableAttribute()]
-    public partial class Bucket : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+    public partial class BucketGroupModel : Metanga.SoftwareDevelopmentKit.Proxy.ProductModel {
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private Metanga.SoftwareDevelopmentKit.Proxy.Bucket[] BucketsField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private Metanga.SoftwareDevelopmentKit.Proxy.Product DefaultProductField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public Metanga.SoftwareDevelopmentKit.Proxy.Bucket[] Buckets {
+            get {
+                return this.BucketsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.BucketsField, value) != true)) {
+                    this.BucketsField = value;
+                    this.RaisePropertyChanged("Buckets");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public Metanga.SoftwareDevelopmentKit.Proxy.Product DefaultProduct {
+            get {
+                return this.DefaultProductField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.DefaultProductField, value) != true)) {
+                    this.DefaultProductField = value;
+                    this.RaisePropertyChanged("DefaultProduct");
+                }
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Tier", Namespace="http://metanga.com")]
+    [System.SerializableAttribute()]
+    public partial class Tier : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
@@ -3717,9 +3733,9 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Tier", Namespace="http://metanga.com")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Bucket", Namespace="http://metanga.com")]
     [System.SerializableAttribute()]
-    public partial class Tier : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+    public partial class Bucket : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
@@ -5176,8 +5192,8 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="AuthenticationConfiguration", Namespace="http://metanga.com")]
     [System.SerializableAttribute()]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.OAuthWebServerConsumerConfiguration))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ClientCertificateConfiguration))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.OAuthWebServerConsumerConfiguration))]
     public partial class AuthenticationConfiguration : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
@@ -5248,6 +5264,13 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
                 propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
             }
         }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ClientCertificateConfiguration", Namespace="http://metanga.com")]
+    [System.SerializableAttribute()]
+    public partial class ClientCertificateConfiguration : Metanga.SoftwareDevelopmentKit.Proxy.AuthenticationConfiguration {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -5431,13 +5454,6 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
                 }
             }
         }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="ClientCertificateConfiguration", Namespace="http://metanga.com")]
-    [System.SerializableAttribute()]
-    public partial class ClientCertificateConfiguration : Metanga.SoftwareDevelopmentKit.Proxy.AuthenticationConfiguration {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -5784,12 +5800,12 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.UnitPrice))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Product))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ProductModel))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.BucketGroupModel))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Bucket[]))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Bucket))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.TierModel))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Tier[]))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Tier))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.BucketGroupModel))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Bucket[]))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Bucket))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.UnitGroup))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.PaymentInfoStatus))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Product[]))]
@@ -5837,8 +5853,8 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.EventType))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.NotificationEndpoint))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.AuthenticationConfiguration))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.OAuthWebServerConsumerConfiguration))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ClientCertificateConfiguration))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.OAuthWebServerConsumerConfiguration))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.NotificationEndpointConfiguration))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.SoapNotificationConfiguration))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.RestfulNotificationConfiguration))]
