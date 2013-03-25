@@ -86,6 +86,17 @@ namespace Metanga.Example
         return;
       }
 
+      PrintConsoleMessage("Running UnitGroup Creation Example...");
+
+      var externalUnitGroupId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+      var unitGroup = CreateUnitGroup(externalUnitGroupId);
+      var unitGroupId = CreateEntityExample(client, unitGroup);
+      if (unitGroupId == null)
+      {
+        EndExample();
+        return;
+      }
+
       PrintConsoleMessage("Running Bulk AggregateException Example...");
       var wrongAccounts = CreateAccountsWithRandomExternalId();
       var isErrorOccurred = false;
@@ -464,6 +475,18 @@ namespace Metanga.Example
         AdvanceRecurringEvents = true,
         RecurringChargeCycle = new [] { "MO" },
         PackageProducts = new[] { reservationPackageProduct, usagePackageProduct, smartPackageProduct },
+      };
+    }
+
+    private static UnitGroup CreateUnitGroup(string externalUnitGroupId)
+    {
+      return new UnitGroup
+      {
+
+        ExternalId = externalUnitGroupId,
+        Name = new Dictionary<string, string>(new Dictionary<string, string> { { "en-us", externalUnitGroupId } }),
+        Description = new Dictionary<string, string>(new Dictionary<string, string> { { "en-us", externalUnitGroupId } }),
+        Units = new[] { "S", "MIN", "HR" },
       };
     }
 
