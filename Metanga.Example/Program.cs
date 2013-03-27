@@ -77,7 +77,8 @@ namespace Metanga.Example
 
       PrintConsoleMessage("Running Package Creation Example...");
       var externalPackageId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
-      var smartExternalProductId = CreateChildProduct(client);
+     var childproduct = CreateChildProduct(client);
+      var smartExternalProductId = CreateSmartProductBucket(client, childproduct);
       var package = CreatePackage(externalPackageId, externalProductId + "-00", smartExternalProductId); // the "00" is to use the first pair of products created
       var packageId = CreateEntityExample(client, package);
       if (packageId == null)
@@ -383,6 +384,36 @@ namespace Metanga.Example
       };
     }
 
+    private static string CreateSmartProductBucket(MetangaClient client, string externalChildProduct)
+    {
+      var externalProductId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+
+      var smartProduct = new SampleProduct
+      {
+        ExternalId = externalProductId,
+        Name = new Dictionary<string, string> { { "en-us", externalProductId } },
+        TimeBased = false,
+        ProductModel = new BucketGroupModel
+        {
+          DefaultProduct = new Product { ExternalId = externalChildProduct },
+          Buckets = new[]
+                  {
+                     new Bucket
+                       {
+                         Capacity = 10,
+                         Product = new Product {ExternalId = externalChildProduct}
+                        },
+                         new Bucket
+                       {
+                         Capacity = 134,
+                         Product = new Product {ExternalId = externalChildProduct}
+                        }
+                  }
+        }
+      };
+      CreateEntityExample(client, smartProduct);
+      return smartProduct.ExternalId;
+    }
     private static string CreateChildProduct(MetangaClient client)
     {
       var externalProductId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
