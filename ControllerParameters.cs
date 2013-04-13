@@ -6,7 +6,7 @@ using Metanga.SoftwareDevelopmentKit.Proxy;
 namespace Metanga.SoftwareDevelopmentKit.Rest
 {
   [DataContract(Namespace = "http://metanga.com")]
-  internal class EnrollParameters
+  public class EnrollParameters
   {
     /// <summary>
     /// New Subscription
@@ -22,7 +22,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
   }
 
   [DataContract(Namespace = "http://metanga.com")]
-  internal class PasswordCredential
+  public class PasswordCredential
   {
     /// <summary>
     /// The username of the account
@@ -72,7 +72,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
   /// Parameters for MeterUsageEvents method
   /// </summary>
   [DataContract(Namespace = "http://metanga.com")]
-  internal class MeterUsageEventsParameters
+  public class MeterUsageEventsParameters
   {
     /// <summary>
     /// New Subscription
