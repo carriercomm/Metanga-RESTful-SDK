@@ -680,6 +680,25 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       return RetrieveEntity<T>(TypeOfIdExternal, externalId);
     }
 
+    /// <summary>
+    /// Retrieves a collection of entities based on the given report 
+    /// </summary>
+    /// <param name="reportId">Entity id of the given report entity.</param>
+    /// <returns>Returns a collection of entities from the database, which satisfy criteria of the report.</returns>
+    public IEnumerable<T> RunReport<T>(Guid reportId)
+    {
+      return RunReport<T>(TypeOfIdMetanga, reportId.ToString());
+    }
+
+    /// <summary>
+    /// Retrieves a collection of entities based on the given report 
+    /// </summary>
+    /// <param name="reportId">External id of the given report entity.</param>
+    /// <returns>Returns a collection of entities from the database, which satisfy criteria of the report.</returns>
+    public IEnumerable<T> RunReport<T>(string reportId)
+    {
+      return RunReport<T>(TypeOfIdExternal, reportId);
+    }
 
     /// <summary>
     /// <para><strong><font color="green">Please note, this is only beta-version of functionality. You should use it for testing purposes.</font></strong></para>
@@ -859,6 +878,19 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
           var stream = response.Content.ReadAsStreamAsync().Result;
           return DeserializeContent<T>(stream);
         }
+      }
+    }
+
+    private IEnumerable<T> RunReport<T>(string typeOfId, string value)
+    {
+      var serviceUri = CombineUri(typeof(Report).Name, value, "data");
+      using (var httpClient = new HttpClient())
+      {
+        PopulateMetangaHeaders(httpClient, typeOfId);
+        var response = httpClient.GetAsync(serviceUri).Result;
+        CheckResponse(response, HttpStatusCode.OK);
+        var responseContent = response.Content.ReadAsStreamAsync().Result;
+        return DeserializeContent<IEnumerable<T>>(responseContent);
       }
     }
 
