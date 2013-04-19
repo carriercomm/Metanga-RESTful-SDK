@@ -685,7 +685,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     /// </summary>
     /// <param name="reportId">Entity id of the given report entity.</param>
     /// <returns>Returns a collection of entities from the database, which satisfy criteria of the report.</returns>
-    public IEnumerable<T> RunReport<T>(Guid reportId)
+    public IEnumerable<T> RunReport<T>(Guid reportId) where T : Entity, new()
     {
       return RunReport<T>(TypeOfIdMetanga, reportId.ToString());
     }
@@ -695,7 +695,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     /// </summary>
     /// <param name="reportId">External id of the given report entity.</param>
     /// <returns>Returns a collection of entities from the database, which satisfy criteria of the report.</returns>
-    public IEnumerable<T> RunReport<T>(string reportId)
+    public IEnumerable<T> RunReport<T>(string reportId) where T : Entity, new()
     {
       return RunReport<T>(TypeOfIdExternal, reportId);
     }
@@ -881,7 +881,7 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
       }
     }
 
-    private IEnumerable<T> RunReport<T>(string typeOfId, string value)
+    private IEnumerable<T> RunReport<T>(string typeOfId, string value) where T :  Entity
     {
       var serviceUri = CombineUri(typeof(Report).Name, value, "data");
       using (var httpClient = new HttpClient())
@@ -890,7 +890,15 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
         var response = httpClient.GetAsync(serviceUri).Result;
         CheckResponse(response, HttpStatusCode.OK);
         var responseContent = response.Content.ReadAsStreamAsync().Result;
-        return DeserializeContent<IEnumerable<T>>(responseContent);
+        switch (ContentType)
+        {
+          case MetangaContentType.Json:
+            return DeserializeContent<IEnumerable<T>>(responseContent);
+          case MetangaContentType.Xml:
+            return DeserializeContent<IEnumerable<Entity>>(responseContent).Select(x => x as T);
+          default:
+            throw new NotSupportedException();
+        }
       }
     }
 
