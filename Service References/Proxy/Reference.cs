@@ -136,15 +136,15 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ElectronicPayment))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Invoice))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ManualPayment))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ExternalBankAccount))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Cash))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Check))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Wire))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ExternalBankAccount))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ExternalCreditCard))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Report))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.NotificationEndpoint))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.EntityType))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Notification))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Report))]
     public partial class Entity : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
@@ -240,10 +240,10 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
     [System.SerializableAttribute()]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ElectronicPayment))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ManualPayment))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ExternalBankAccount))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Cash))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Check))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Wire))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ExternalBankAccount))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ExternalCreditCard))]
     public partial class Payment : Metanga.SoftwareDevelopmentKit.Proxy.Entity {
         
@@ -2899,10 +2899,10 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="ManualPayment", Namespace="http://metanga.com")]
     [System.SerializableAttribute()]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ExternalBankAccount))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Cash))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Check))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.Wire))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ExternalBankAccount))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ExternalCreditCard))]
     public partial class ManualPayment : Metanga.SoftwareDevelopmentKit.Proxy.Payment {
         
@@ -2918,6 +2918,75 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
                 if ((this.PaymentOperationField.Equals(value) != true)) {
                     this.PaymentOperationField = value;
                     this.RaisePropertyChanged("PaymentOperation");
+                }
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Cash", Namespace="http://metanga.com")]
+    [System.SerializableAttribute()]
+    public partial class Cash : Metanga.SoftwareDevelopmentKit.Proxy.ManualPayment {
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string ReferenceNumberField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string ReferenceNumber {
+            get {
+                return this.ReferenceNumberField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ReferenceNumberField, value) != true)) {
+                    this.ReferenceNumberField = value;
+                    this.RaisePropertyChanged("ReferenceNumber");
+                }
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Check", Namespace="http://metanga.com")]
+    [System.SerializableAttribute()]
+    public partial class Check : Metanga.SoftwareDevelopmentKit.Proxy.ManualPayment {
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string CheckNumberField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string CheckNumber {
+            get {
+                return this.CheckNumberField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CheckNumberField, value) != true)) {
+                    this.CheckNumberField = value;
+                    this.RaisePropertyChanged("CheckNumber");
+                }
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Wire", Namespace="http://metanga.com")]
+    [System.SerializableAttribute()]
+    public partial class Wire : Metanga.SoftwareDevelopmentKit.Proxy.ManualPayment {
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string ReferenceNumberField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string ReferenceNumber {
+            get {
+                return this.ReferenceNumberField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ReferenceNumberField, value) != true)) {
+                    this.ReferenceNumberField = value;
+                    this.RaisePropertyChanged("ReferenceNumber");
                 }
             }
         }
@@ -2979,75 +3048,6 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
                 }
             }
         }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
-        public string ReferenceNumber {
-            get {
-                return this.ReferenceNumberField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.ReferenceNumberField, value) != true)) {
-                    this.ReferenceNumberField = value;
-                    this.RaisePropertyChanged("ReferenceNumber");
-                }
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Cash", Namespace="http://metanga.com")]
-    [System.SerializableAttribute()]
-    public partial class Cash : Metanga.SoftwareDevelopmentKit.Proxy.ManualPayment {
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string ReferenceNumberField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
-        public string ReferenceNumber {
-            get {
-                return this.ReferenceNumberField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.ReferenceNumberField, value) != true)) {
-                    this.ReferenceNumberField = value;
-                    this.RaisePropertyChanged("ReferenceNumber");
-                }
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Check", Namespace="http://metanga.com")]
-    [System.SerializableAttribute()]
-    public partial class Check : Metanga.SoftwareDevelopmentKit.Proxy.ManualPayment {
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string CheckNumberField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
-        public string CheckNumber {
-            get {
-                return this.CheckNumberField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.CheckNumberField, value) != true)) {
-                    this.CheckNumberField = value;
-                    this.RaisePropertyChanged("CheckNumber");
-                }
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Wire", Namespace="http://metanga.com")]
-    [System.SerializableAttribute()]
-    public partial class Wire : Metanga.SoftwareDevelopmentKit.Proxy.ManualPayment {
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string ReferenceNumberField;
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
         public string ReferenceNumber {
@@ -3129,77 +3129,6 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
                 if ((object.ReferenceEquals(this.ReferenceNumberField, value) != true)) {
                     this.ReferenceNumberField = value;
                     this.RaisePropertyChanged("ReferenceNumber");
-                }
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Report", Namespace="http://metanga.com")]
-    [System.SerializableAttribute()]
-    public partial class Report : Metanga.SoftwareDevelopmentKit.Proxy.Entity {
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string ArgumentEntityTypeField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string[] ColumnsField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private Metanga.SoftwareDevelopmentKit.Proxy.BinaryExpression FilterField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Collections.Generic.Dictionary<string, Metanga.SoftwareDevelopmentKit.Proxy.OrderDirection> OrderField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
-        public string ArgumentEntityType {
-            get {
-                return this.ArgumentEntityTypeField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.ArgumentEntityTypeField, value) != true)) {
-                    this.ArgumentEntityTypeField = value;
-                    this.RaisePropertyChanged("ArgumentEntityType");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
-        public string[] Columns {
-            get {
-                return this.ColumnsField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.ColumnsField, value) != true)) {
-                    this.ColumnsField = value;
-                    this.RaisePropertyChanged("Columns");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
-        public Metanga.SoftwareDevelopmentKit.Proxy.BinaryExpression Filter {
-            get {
-                return this.FilterField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.FilterField, value) != true)) {
-                    this.FilterField = value;
-                    this.RaisePropertyChanged("Filter");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
-        public System.Collections.Generic.Dictionary<string, Metanga.SoftwareDevelopmentKit.Proxy.OrderDirection> Order {
-            get {
-                return this.OrderField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.OrderField, value) != true)) {
-                    this.OrderField = value;
-                    this.RaisePropertyChanged("Order");
                 }
             }
         }
@@ -3397,6 +3326,77 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
                 if ((object.ReferenceEquals(this.TriggerEntityTypeField, value) != true)) {
                     this.TriggerEntityTypeField = value;
                     this.RaisePropertyChanged("TriggerEntityType");
+                }
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Report", Namespace="http://metanga.com")]
+    [System.SerializableAttribute()]
+    public partial class Report : Metanga.SoftwareDevelopmentKit.Proxy.Entity {
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string ArgumentEntityTypeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string[] ColumnsField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private Metanga.SoftwareDevelopmentKit.Proxy.BinaryExpression FilterField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Collections.Generic.Dictionary<string, Metanga.SoftwareDevelopmentKit.Proxy.OrderDirection> OrderField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string ArgumentEntityType {
+            get {
+                return this.ArgumentEntityTypeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ArgumentEntityTypeField, value) != true)) {
+                    this.ArgumentEntityTypeField = value;
+                    this.RaisePropertyChanged("ArgumentEntityType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string[] Columns {
+            get {
+                return this.ColumnsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ColumnsField, value) != true)) {
+                    this.ColumnsField = value;
+                    this.RaisePropertyChanged("Columns");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public Metanga.SoftwareDevelopmentKit.Proxy.BinaryExpression Filter {
+            get {
+                return this.FilterField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.FilterField, value) != true)) {
+                    this.FilterField = value;
+                    this.RaisePropertyChanged("Filter");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public System.Collections.Generic.Dictionary<string, Metanga.SoftwareDevelopmentKit.Proxy.OrderDirection> Order {
+            get {
+                return this.OrderField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.OrderField, value) != true)) {
+                    this.OrderField = value;
+                    this.RaisePropertyChanged("Order");
                 }
             }
         }
@@ -5334,183 +5334,10 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="BinaryExpression", Namespace="http://metanga.com")]
-    [System.SerializableAttribute()]
-    public partial class BinaryExpression : Metanga.SoftwareDevelopmentKit.Proxy.Expression {
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private Metanga.SoftwareDevelopmentKit.Proxy.Expression LeftField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private Metanga.SoftwareDevelopmentKit.Proxy.BinaryOperator OperatorField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private Metanga.SoftwareDevelopmentKit.Proxy.Expression RightField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public Metanga.SoftwareDevelopmentKit.Proxy.Expression Left {
-            get {
-                return this.LeftField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.LeftField, value) != true)) {
-                    this.LeftField = value;
-                    this.RaisePropertyChanged("Left");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public Metanga.SoftwareDevelopmentKit.Proxy.BinaryOperator Operator {
-            get {
-                return this.OperatorField;
-            }
-            set {
-                if ((this.OperatorField.Equals(value) != true)) {
-                    this.OperatorField = value;
-                    this.RaisePropertyChanged("Operator");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public Metanga.SoftwareDevelopmentKit.Proxy.Expression Right {
-            get {
-                return this.RightField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.RightField, value) != true)) {
-                    this.RightField = value;
-                    this.RaisePropertyChanged("Right");
-                }
-            }
-        }
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="OrderDirection", Namespace="http://metanga.com")]
-    public enum OrderDirection : int {
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Ascending = 0,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Descending = 1,
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Expression", Namespace="http://metanga.com")]
-    [System.SerializableAttribute()]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ConstantExpression))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.PropertyExpression))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.BinaryExpression))]
-    public partial class Expression : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="ConstantExpression", Namespace="http://metanga.com")]
-    [System.SerializableAttribute()]
-    public partial class ConstantExpression : Metanga.SoftwareDevelopmentKit.Proxy.Expression {
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private object ValueField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public object Value {
-            get {
-                return this.ValueField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.ValueField, value) != true)) {
-                    this.ValueField = value;
-                    this.RaisePropertyChanged("Value");
-                }
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="PropertyExpression", Namespace="http://metanga.com")]
-    [System.SerializableAttribute()]
-    public partial class PropertyExpression : Metanga.SoftwareDevelopmentKit.Proxy.Expression {
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string NameField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Name {
-            get {
-                return this.NameField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.NameField, value) != true)) {
-                    this.NameField = value;
-                    this.RaisePropertyChanged("Name");
-                }
-            }
-        }
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="BinaryOperator", Namespace="http://metanga.com")]
-    public enum BinaryOperator : int {
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Or = 0,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        And = 1,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        NotEqual = 2,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Equal = 3,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        GreaterThanOrEqual = 4,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        LessThanOrEqual = 5,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        GreaterThan = 6,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        LessThan = 7,
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="AuthenticationConfiguration", Namespace="http://metanga.com")]
     [System.SerializableAttribute()]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.OAuthWebServerConsumerConfiguration))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ClientCertificateConfiguration))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.OAuthWebServerConsumerConfiguration))]
     public partial class AuthenticationConfiguration : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
@@ -5540,8 +5367,8 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="NotificationEndpointConfiguration", Namespace="http://metanga.com")]
     [System.SerializableAttribute()]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.RestfulNotificationConfiguration))]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.SoapNotificationConfiguration))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.RestfulNotificationConfiguration))]
     public partial class NotificationEndpointConfiguration : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
@@ -5581,6 +5408,13 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
                 propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
             }
         }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ClientCertificateConfiguration", Namespace="http://metanga.com")]
+    [System.SerializableAttribute()]
+    public partial class ClientCertificateConfiguration : Metanga.SoftwareDevelopmentKit.Proxy.AuthenticationConfiguration {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -5768,9 +5602,41 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="ClientCertificateConfiguration", Namespace="http://metanga.com")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="SoapNotificationConfiguration", Namespace="http://metanga.com")]
     [System.SerializableAttribute()]
-    public partial class ClientCertificateConfiguration : Metanga.SoftwareDevelopmentKit.Proxy.AuthenticationConfiguration {
+    public partial class SoapNotificationConfiguration : Metanga.SoftwareDevelopmentKit.Proxy.NotificationEndpointConfiguration {
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Collections.Generic.Dictionary<string, string> CustomHeadersField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string ServiceVersionField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public System.Collections.Generic.Dictionary<string, string> CustomHeaders {
+            get {
+                return this.CustomHeadersField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CustomHeadersField, value) != true)) {
+                    this.CustomHeadersField = value;
+                    this.RaisePropertyChanged("CustomHeaders");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public string ServiceVersion {
+            get {
+                return this.ServiceVersionField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ServiceVersionField, value) != true)) {
+                    this.ServiceVersionField = value;
+                    this.RaisePropertyChanged("ServiceVersion");
+                }
+            }
+        }
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -5807,45 +5673,6 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
                 if ((object.ReferenceEquals(this.CustomHeadersField, value) != true)) {
                     this.CustomHeadersField = value;
                     this.RaisePropertyChanged("CustomHeaders");
-                }
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="SoapNotificationConfiguration", Namespace="http://metanga.com")]
-    [System.SerializableAttribute()]
-    public partial class SoapNotificationConfiguration : Metanga.SoftwareDevelopmentKit.Proxy.NotificationEndpointConfiguration {
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Collections.Generic.Dictionary<string, string> CustomHeadersField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string ServiceVersionField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
-        public System.Collections.Generic.Dictionary<string, string> CustomHeaders {
-            get {
-                return this.CustomHeadersField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.CustomHeadersField, value) != true)) {
-                    this.CustomHeadersField = value;
-                    this.RaisePropertyChanged("CustomHeaders");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
-        public string ServiceVersion {
-            get {
-                return this.ServiceVersionField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.ServiceVersionField, value) != true)) {
-                    this.ServiceVersionField = value;
-                    this.RaisePropertyChanged("ServiceVersion");
                 }
             }
         }
@@ -6000,6 +5827,179 @@ namespace Metanga.SoftwareDevelopmentKit.Proxy {
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
         Delete = 2,
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="BinaryExpression", Namespace="http://metanga.com")]
+    [System.SerializableAttribute()]
+    public partial class BinaryExpression : Metanga.SoftwareDevelopmentKit.Proxy.Expression {
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private Metanga.SoftwareDevelopmentKit.Proxy.Expression LeftField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private Metanga.SoftwareDevelopmentKit.Proxy.BinaryOperator OperatorField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private Metanga.SoftwareDevelopmentKit.Proxy.Expression RightField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public Metanga.SoftwareDevelopmentKit.Proxy.Expression Left {
+            get {
+                return this.LeftField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.LeftField, value) != true)) {
+                    this.LeftField = value;
+                    this.RaisePropertyChanged("Left");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public Metanga.SoftwareDevelopmentKit.Proxy.BinaryOperator Operator {
+            get {
+                return this.OperatorField;
+            }
+            set {
+                if ((this.OperatorField.Equals(value) != true)) {
+                    this.OperatorField = value;
+                    this.RaisePropertyChanged("Operator");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public Metanga.SoftwareDevelopmentKit.Proxy.Expression Right {
+            get {
+                return this.RightField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.RightField, value) != true)) {
+                    this.RightField = value;
+                    this.RaisePropertyChanged("Right");
+                }
+            }
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="OrderDirection", Namespace="http://metanga.com")]
+    public enum OrderDirection : int {
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Ascending = 0,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Descending = 1,
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Expression", Namespace="http://metanga.com")]
+    [System.SerializableAttribute()]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.ConstantExpression))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.PropertyExpression))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(Metanga.SoftwareDevelopmentKit.Proxy.BinaryExpression))]
+    public partial class Expression : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ConstantExpression", Namespace="http://metanga.com")]
+    [System.SerializableAttribute()]
+    public partial class ConstantExpression : Metanga.SoftwareDevelopmentKit.Proxy.Expression {
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private object ValueField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public object Value {
+            get {
+                return this.ValueField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ValueField, value) != true)) {
+                    this.ValueField = value;
+                    this.RaisePropertyChanged("Value");
+                }
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="PropertyExpression", Namespace="http://metanga.com")]
+    [System.SerializableAttribute()]
+    public partial class PropertyExpression : Metanga.SoftwareDevelopmentKit.Proxy.Expression {
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string NameField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Name {
+            get {
+                return this.NameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NameField, value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="BinaryOperator", Namespace="http://metanga.com")]
+    public enum BinaryOperator : int {
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Or = 0,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        And = 1,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        NotEqual = 2,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Equal = 3,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        GreaterThanOrEqual = 4,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        LessThanOrEqual = 5,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        GreaterThan = 6,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        LessThan = 7,
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
