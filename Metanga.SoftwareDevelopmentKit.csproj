@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="ControllerParameters.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="MetangaAggregateException.cs" />
     <Compile Include="MetangaClient.cs" />
     <Compile Include="MetangaException.cs" />
