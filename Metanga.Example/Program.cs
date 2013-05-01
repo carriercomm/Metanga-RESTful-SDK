@@ -62,11 +62,37 @@ namespace Metanga.Example
         return;
       }
 
+      PrintConsoleMessage("Running SmartProduct with tier Creation Example...");
+     
+      var externalChildProductId = CreateChildProduct(client);
+      var externalSmartProductId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+      var product = CreateSmartProductTier(externalSmartProductId, externalChildProductId);
+      var productId = CreateEntityExample(client, product);
+      if (productId == null)
+      {
+        EndExample();
+        return;
+      }
+
+
       PrintConsoleMessage("Running Package Creation Example...");
       var externalPackageId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
-      var package = CreatePackage(externalPackageId, externalProductId + "-00"); // the "00" is to use the first pair of products created
+     var childproduct = CreateChildProduct(client);
+      var smartExternalProductId = CreateSmartProductBucket(client, childproduct);
+      var package = CreatePackage(externalPackageId, externalProductId + "-00", smartExternalProductId); // the "00" is to use the first pair of products created
       var packageId = CreateEntityExample(client, package);
       if (packageId == null)
+      {
+        EndExample();
+        return;
+      }
+
+      PrintConsoleMessage("Running UnitGroup Creation Example...");
+
+      var externalUnitGroupId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+      var unitGroup = CreateUnitGroup(externalUnitGroupId);
+      var unitGroupId = CreateEntityExample(client, unitGroup);
+      if (unitGroupId == null)
       {
         EndExample();
         return;
@@ -85,15 +111,20 @@ namespace Metanga.Example
         PrintConsoleMessage(String.Format("An error has occurred during entity update: Id={0}, Message={1}", e.ErrorId, e.Message));
         foreach (var childException in e.Exceptions)
         {
-          PrintConsoleMessage(String.Format("Entity {0} had the following error: {1}", childException.Key.ExternalId, childException.Value.Message));
+          PrintConsoleMessage(String.Format("Entity {0} had the following error: {1}", childException.EntityReference.ExternalId, childException.Error.Message));
         }
       }
       if (!isErrorOccurred)
       {
         EndExample();
         return;
-      }
-
+      } 
+      
+      //Retrieving Unit of Measure
+      PrintConsoleMessage("Running Retrieving Unit of Measure Minute Example...");
+     var unit=client.RetrieveUnit("Min");
+     PrintConsoleMessage(String.Format("Unit of Measue {0} has a base unit: {1} and convertion:{2}", unit.UnitCode, unit.BaseUnitCode, unit.BaseUnitConversion));
+     
       PrintConsoleMessage("Running Enrollment Example...");
       var subscription = EnrollmentExample(client, externalPackageId, externalProductId + "-00");
 
@@ -162,6 +193,9 @@ namespace Metanga.Example
       PrintConsoleMessage("Running Create Reverse operation for Electronic payment Example...");
       client.ProcessElectronicPayment(electronicPaymentReverse);
 
+      PrintConsoleMessage("Running Retry Failed Payment Example...");
+      //var retryElectronicPayment = new ElectronicPayment {EntityId = Guid.Empty};//Set failed payment EntityId
+      //retryElectronicPayment = client.RetryFailedPayment(retryElectronicPayment);
 
       PrintConsoleMessage("Closing connection to Metanga...");
       CloseMetangaClient(client);
@@ -350,7 +384,85 @@ namespace Metanga.Example
       };
     }
 
-    private static SamplePackage CreatePackage(string externalPackageId, string externalProductId)
+    private static string CreateSmartProductBucket(MetangaClient client, string externalChildProduct)
+    {
+      var externalProductId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+
+      var smartProduct = new SampleProduct
+      {
+        ExternalId = externalProductId,
+        Name = new Dictionary<string, string> { { "en-us", externalProductId } },
+        TimeBased = false,
+        ProductModel = new BucketGroupModel
+        {
+          DefaultProduct = new Product { ExternalId = externalChildProduct },
+          Buckets = new[]
+                  {
+                     new Bucket
+                       {
+                         Capacity = 10,
+                         Product = new Product {ExternalId = externalChildProduct}
+                        },
+                         new Bucket
+                       {
+                         Capacity = 134,
+                         Product = new Product {ExternalId = externalChildProduct}
+                        }
+                  }
+        }
+      };
+      CreateEntityExample(client, smartProduct);
+      return smartProduct.ExternalId;
+    }
+    private static string CreateChildProduct(MetangaClient client)
+    {
+      var externalProductId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
+
+      var childProduct = new SampleProduct
+                           {
+                             ExternalId = externalProductId,
+                             Name = new Dictionary<string, string> {{"en-us", externalProductId}},
+                             Taxable = true,
+                             TimeBased = false,
+                             UnitGroup = null,
+                             TierQuantity = "111"
+                           };
+      CreateEntityExample(client, childProduct);
+      return childProduct.ExternalId;
+    }
+
+    private static SampleProduct CreateSmartProductTier(string externalSmartProductId,string externalProductId)
+    {
+      // Create a Smart Product for Cloud Storage. 
+      return new SampleProduct
+      {
+        ExternalId = externalSmartProductId,
+        Name = new Dictionary<string, string> { { "en-us", externalSmartProductId } },
+        TimeBased = false,
+        ProductModel = new TierModel
+           {
+             DefaultProduct = new Product { ExternalId = externalProductId },
+             Tiers = new[]
+                  {
+                     new Tier
+                       {
+                         Capacity = 10,
+                         Product = new Product {ExternalId = externalProductId}
+                        },
+                         new Tier
+                       {
+                         Capacity = 134,
+                         Product = new Product {ExternalId = externalProductId}
+                        }
+                  }
+           }
+      
+      };
+    }
+
+
+
+    private static SamplePackage CreatePackage(string externalPackageId, string externalProductId, string smartProductExternalid)
     {
       // Create a Package to bill for Cloud Storage. This is a special package with a discounted price of $0.09 / Gigabyte / Month
 
@@ -368,13 +480,44 @@ namespace Metanga.Example
         PriceSchedule = CreatePriceSchedule(0.005m, "1", null)
       };
 
+      var product = new Product {ExternalId = smartProductExternalid};
+      var smartPackageProduct = new PackageProduct
+                                  {
+                                    Product = product,
+                                    ProductModel = new BucketGroupModel
+                                                     {
+                                                       DefaultProduct = product,
+                                                       Buckets = new[]
+                                                                   {
+                                                                     new Bucket
+                                                                       {
+                                                                         Capacity = 10,
+                                                                         Product = product
+                                                                       }
+                                                                   }
+                                                     }
+                                  };
+
+
       return new SamplePackage
       {
         ExternalId = externalPackageId,
         Name = new Dictionary<string, string> { { "en-us", externalPackageId } },
         AdvanceRecurringEvents = true,
         RecurringChargeCycle = new [] { "MO" },
-        PackageProducts = new [] { reservationPackageProduct, usagePackageProduct }
+        PackageProducts = new[] { reservationPackageProduct, usagePackageProduct, smartPackageProduct },
+      };
+    }
+
+    private static UnitGroup CreateUnitGroup(string externalUnitGroupId)
+    {
+      return new UnitGroup
+      {
+
+        ExternalId = externalUnitGroupId,
+        Name = new Dictionary<string, string>(new Dictionary<string, string> { { "en-us", externalUnitGroupId } }),
+        Description = new Dictionary<string, string>(new Dictionary<string, string> { { "en-us", externalUnitGroupId } }),
+        Units = new[] { "S", "MIN", "HR" },
       };
     }
 

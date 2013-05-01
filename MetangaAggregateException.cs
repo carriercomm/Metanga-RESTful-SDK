@@ -48,12 +48,17 @@ namespace Metanga.SoftwareDevelopmentKit
       : base(info, context)
     {
     }
-
-    public MetangaAggregateException(ErrorData errorData)
-      : base(errorData.ErrorMessage, errorData.ErrorId)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="errorId"></param>
+    /// <param name="innerErrors"></param>
+    public MetangaAggregateException(string message, Guid errorId, IEnumerable<ErrorData> innerErrors)
+      : base(message, errorId)
     {
-      Exceptions =
-        errorData.InnerErrors.Select(x => new KeyValuePair<Entity, MetangaException>(x.AssociatedEntity, new MetangaException(x.ErrorMessage, x.ErrorId)));
+      if (innerErrors == null) throw new ArgumentNullException("innerErrors");
+      Exceptions = innerErrors.Select(x => new EntityError(x.AssociatedEntity, new MetangaException(x.ErrorMessage, x.ErrorId)));
     }
 
     /// <summary>
@@ -72,6 +77,34 @@ namespace Metanga.SoftwareDevelopmentKit
     /// <summary>
     /// List of exceptions
     /// </summary>
-    public IEnumerable<KeyValuePair<Entity, MetangaException>> Exceptions { get; set; }
+    public IEnumerable<EntityError> Exceptions { get; set; }
+  }
+
+  /// <summary>
+  /// Entity Error
+  /// </summary>
+  [Serializable]
+  public class EntityError
+  {
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="entityReference"></param>
+    /// <param name="metangaException"></param>
+    /// <exception cref="NotImplementedException"></exception>
+    public EntityError(Entity entityReference, MetangaException metangaException)
+    {
+      EntityReference = entityReference;
+      Error = metangaException;
+    }
+
+    /// <summary>
+    /// Entity Reference
+    /// </summary>
+    public Entity EntityReference { get; set; }
+    /// <summary>
+    /// Metanga Exception
+    /// </summary>
+    public MetangaException Error { get; set; }
   }
 }
