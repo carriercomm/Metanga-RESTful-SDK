@@ -5,6 +5,9 @@ using Metanga.SoftwareDevelopmentKit.Proxy;
 
 namespace Metanga.SoftwareDevelopmentKit.Rest
 {
+  /// <summary>
+  /// Parameters passed to the Enroll service in the body of the request
+  /// </summary>
   [DataContract(Namespace = "http://metanga.com")]
   public class EnrollParameters
   {
@@ -21,6 +24,9 @@ namespace Metanga.SoftwareDevelopmentKit.Rest
     public Account Account { get; set; }
   }
 
+  /// <summary>
+  /// Parameters passed to the Create Session service in the body of the request
+  /// </summary>
   [DataContract(Namespace = "http://metanga.com")]
   public class PasswordCredential
   {
