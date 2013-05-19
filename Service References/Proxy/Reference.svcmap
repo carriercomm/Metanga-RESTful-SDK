@@ -21,7 +21,7 @@
     <MetadataSource Address="https://metangadev41.metratech.com/wsdl/" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="Metanga.wsdl" MetadataType="Wsdl" ID="5030a3a0-81f9-4ee0-9f61-26ef7c5ae06e" SourceId="1" SourceUrl="https://metangadev41.metratech.com/wsdl/" />
+    <MetadataFile FileName="Metanga.wsdl" MetadataType="Wsdl" ID="c90e60bb-9877-48f2-a19c-bc11c9bae1d6" SourceId="1" SourceUrl="https://metangadev41.metratech.com/wsdl/" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
