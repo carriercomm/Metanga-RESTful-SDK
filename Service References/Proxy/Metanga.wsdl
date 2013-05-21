@@ -69,10 +69,25 @@
       <xs:attribute name="Ref" type="xs:IDREF" />
     </xs:schema>
     <xsd:schema xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/" elementFormDefault="qualified" targetNamespace="http://metanga.com">
-      <xsd:complexType name="Cash">
+      <xsd:complexType name="ExternalCreditCard">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:ManualPayment">
             <xsd:sequence>
+              <xsd:element minOccurs="0" name="CreditCardType" type="tns:CreditCardType" />
+              <xsd:element minOccurs="0" name="ExpirationDate" nillable="true" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="Last4Digits" nillable="true" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
               <xsd:element minOccurs="0" name="ReferenceNumber" nillable="true" type="xsd:string">
                 <xsd:annotation>
                   <xsd:appinfo>
@@ -84,7 +99,7 @@
           </xsd:extension>
         </xsd:complexContent>
       </xsd:complexType>
-      <xsd:element name="Cash" nillable="true" type="tns:Cash" />
+      <xsd:element name="ExternalCreditCard" nillable="true" type="tns:ExternalCreditCard" />
       <xsd:complexType name="ManualPayment">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:Payment">
@@ -871,48 +886,6 @@
         <xsd:sequence />
       </xsd:complexType>
       <xsd:element name="ProductModel" nillable="true" type="tns:ProductModel" />
-      <xsd:complexType name="TierModel">
-        <xsd:complexContent mixed="false">
-          <xsd:extension base="tns:ProductModel">
-            <xsd:sequence>
-              <xsd:element minOccurs="0" name="DefaultProduct" nillable="true" type="tns:Product">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="Tiers" nillable="true" type="tns:ArrayOfTier">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-            </xsd:sequence>
-          </xsd:extension>
-        </xsd:complexContent>
-      </xsd:complexType>
-      <xsd:element name="TierModel" nillable="true" type="tns:TierModel" />
-      <xsd:complexType name="ArrayOfTier">
-        <xsd:sequence>
-          <xsd:element minOccurs="0" maxOccurs="unbounded" name="Tier" nillable="true" type="tns:Tier" />
-        </xsd:sequence>
-      </xsd:complexType>
-      <xsd:element name="ArrayOfTier" nillable="true" type="tns:ArrayOfTier" />
-      <xsd:complexType name="Tier">
-        <xsd:sequence>
-          <xsd:element minOccurs="0" name="Capacity" type="xsd:decimal" />
-          <xsd:element minOccurs="0" name="Product" nillable="true" type="tns:Product">
-            <xsd:annotation>
-              <xsd:appinfo>
-                <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-              </xsd:appinfo>
-            </xsd:annotation>
-          </xsd:element>
-        </xsd:sequence>
-      </xsd:complexType>
-      <xsd:element name="Tier" nillable="true" type="tns:Tier" />
       <xsd:complexType name="BucketGroupModel">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:ProductModel">
@@ -955,6 +928,48 @@
         </xsd:sequence>
       </xsd:complexType>
       <xsd:element name="Bucket" nillable="true" type="tns:Bucket" />
+      <xsd:complexType name="TierModel">
+        <xsd:complexContent mixed="false">
+          <xsd:extension base="tns:ProductModel">
+            <xsd:sequence>
+              <xsd:element minOccurs="0" name="DefaultProduct" nillable="true" type="tns:Product">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="Tiers" nillable="true" type="tns:ArrayOfTier">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:extension>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:element name="TierModel" nillable="true" type="tns:TierModel" />
+      <xsd:complexType name="ArrayOfTier">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="Tier" nillable="true" type="tns:Tier" />
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="ArrayOfTier" nillable="true" type="tns:ArrayOfTier" />
+      <xsd:complexType name="Tier">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="Capacity" type="xsd:decimal" />
+          <xsd:element minOccurs="0" name="Product" nillable="true" type="tns:Product">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:element name="Tier" nillable="true" type="tns:Tier" />
       <xsd:complexType name="UnitGroup">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:Entity">
@@ -1397,74 +1412,6 @@
         </xsd:sequence>
       </xsd:complexType>
       <xsd:element name="SubscriptionPackageProduct" nillable="true" type="tns:SubscriptionPackageProduct" />
-      <xsd:complexType name="ExternalBankAccount">
-        <xsd:complexContent mixed="false">
-          <xsd:extension base="tns:ManualPayment">
-            <xsd:sequence>
-              <xsd:element minOccurs="0" name="AccountHoldersName" nillable="true" type="xsd:string">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="BankName" nillable="true" type="xsd:string">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="Last4Digits" nillable="true" type="xsd:string">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="ReferenceNumber" nillable="true" type="xsd:string">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-            </xsd:sequence>
-          </xsd:extension>
-        </xsd:complexContent>
-      </xsd:complexType>
-      <xsd:element name="ExternalBankAccount" nillable="true" type="tns:ExternalBankAccount" />
-      <xsd:complexType name="ExternalCreditCard">
-        <xsd:complexContent mixed="false">
-          <xsd:extension base="tns:ManualPayment">
-            <xsd:sequence>
-              <xsd:element minOccurs="0" name="CreditCardType" type="tns:CreditCardType" />
-              <xsd:element minOccurs="0" name="ExpirationDate" nillable="true" type="xsd:string">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="Last4Digits" nillable="true" type="xsd:string">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="ReferenceNumber" nillable="true" type="xsd:string">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-            </xsd:sequence>
-          </xsd:extension>
-        </xsd:complexContent>
-      </xsd:complexType>
-      <xsd:element name="ExternalCreditCard" nillable="true" type="tns:ExternalCreditCard" />
       <xsd:complexType name="Invoice">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:Entity">
@@ -1698,52 +1645,14 @@
         </xsd:restriction>
       </xsd:simpleType>
       <xsd:element name="StatementTransactionType" nillable="true" type="tns:StatementTransactionType" />
-      <xsd:complexType name="Notification">
+      <xsd:complexType name="ReportCategory">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:Entity">
-            <xsd:sequence>
-              <xsd:element minOccurs="0" name="Active" type="xsd:boolean" />
-              <xsd:element minOccurs="0" name="EventName" nillable="true" type="xsd:string">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="EventType" type="tns:EventType">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="NotificationEndpoint" nillable="true" type="tns:NotificationEndpoint">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="TriggerEntityType" nillable="true" type="xsd:string">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-            </xsd:sequence>
+            <xsd:sequence />
           </xsd:extension>
         </xsd:complexContent>
       </xsd:complexType>
-      <xsd:element name="Notification" nillable="true" type="tns:Notification" />
-      <xsd:simpleType name="EventType">
-        <xsd:restriction base="xsd:string">
-          <xsd:enumeration value="Create" />
-          <xsd:enumeration value="Update" />
-          <xsd:enumeration value="Delete" />
-        </xsd:restriction>
-      </xsd:simpleType>
-      <xsd:element name="EventType" nillable="true" type="tns:EventType" />
+      <xsd:element name="ReportCategory" nillable="true" type="tns:ReportCategory" />
       <xsd:complexType name="NotificationEndpoint">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:Entity">
@@ -2034,6 +1943,22 @@
         </xsd:restriction>
       </xsd:simpleType>
       <xsd:element name="DataType" nillable="true" type="tns:DataType" />
+      <xsd:complexType name="Cash">
+        <xsd:complexContent mixed="false">
+          <xsd:extension base="tns:ManualPayment">
+            <xsd:sequence>
+              <xsd:element minOccurs="0" name="ReferenceNumber" nillable="true" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:extension>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:element name="Cash" nillable="true" type="tns:Cash" />
       <xsd:complexType name="Check">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:ManualPayment">
@@ -2066,6 +1991,190 @@
         </xsd:complexContent>
       </xsd:complexType>
       <xsd:element name="Wire" nillable="true" type="tns:Wire" />
+      <xsd:complexType name="ExternalBankAccount">
+        <xsd:complexContent mixed="false">
+          <xsd:extension base="tns:ManualPayment">
+            <xsd:sequence>
+              <xsd:element minOccurs="0" name="AccountHoldersName" nillable="true" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="BankName" nillable="true" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="Last4Digits" nillable="true" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="ReferenceNumber" nillable="true" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:extension>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:element name="ExternalBankAccount" nillable="true" type="tns:ExternalBankAccount" />
+      <xsd:complexType name="Location">
+        <xsd:complexContent mixed="false">
+          <xsd:extension base="tns:Entity">
+            <xsd:sequence>
+              <xsd:element xmlns:q11="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Abbreviation" nillable="true" type="q11:ArrayOfKeyValueOfstringstring">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="CountryCode" nillable="true" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="ParentLocation" nillable="true" type="tns:Location">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:extension>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:element name="Location" nillable="true" type="tns:Location" />
+      <xsd:complexType name="Notification">
+        <xsd:complexContent mixed="false">
+          <xsd:extension base="tns:Entity">
+            <xsd:sequence>
+              <xsd:element minOccurs="0" name="Active" type="xsd:boolean" />
+              <xsd:element minOccurs="0" name="EventName" nillable="true" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="EventType" type="tns:EventType">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="NotificationEndpoint" nillable="true" type="tns:NotificationEndpoint">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="TriggerEntityType" nillable="true" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:extension>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:element name="Notification" nillable="true" type="tns:Notification" />
+      <xsd:simpleType name="EventType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Create" />
+          <xsd:enumeration value="Update" />
+          <xsd:enumeration value="Delete" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:element name="EventType" nillable="true" type="tns:EventType" />
+      <xsd:complexType name="ElectronicPayment">
+        <xsd:complexContent mixed="false">
+          <xsd:extension base="tns:Payment">
+            <xsd:sequence>
+              <xsd:element xmlns:q12="http://schemas.datacontract.org/2004/07/PaymentBroker.Presentation" minOccurs="0" name="FailedReason" nillable="true" type="q12:ProviderResponse">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="FailedStatus" nillable="true" type="tns:FailedPaymentStatus" />
+              <xsd:element minOccurs="0" name="FailedUpdated" nillable="true" type="xsd:dateTime" />
+              <xsd:element minOccurs="0" name="Invoice" nillable="true" type="tns:Invoice">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="NumberOfAttempts" nillable="true" type="xsd:int">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="PaymentInstrument" nillable="true" type="tns:PaymentInstrumentMasked">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element minOccurs="0" name="PaymentOperation" type="tns:ElectronicPaymentOperation" />
+              <xsd:element minOccurs="0" name="Reference" nillable="true" type="tns:ElectronicPayment">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+              <xsd:element xmlns:q13="http://schemas.datacontract.org/2004/07/PaymentBroker.Presentation.Enums" minOccurs="0" name="Status" type="q13:TransactionStatus" />
+              <xsd:element minOccurs="0" name="StatusUpdated" type="xsd:dateTime">
+                <xsd:annotation>
+                  <xsd:appinfo>
+                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </xsd:appinfo>
+                </xsd:annotation>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:extension>
+        </xsd:complexContent>
+      </xsd:complexType>
+      <xsd:element name="ElectronicPayment" nillable="true" type="tns:ElectronicPayment" />
+      <xsd:simpleType name="FailedPaymentStatus">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Failed" />
+          <xsd:enumeration value="Succeeded" />
+          <xsd:enumeration value="Dismissed" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:element name="FailedPaymentStatus" nillable="true" type="tns:FailedPaymentStatus" />
+      <xsd:simpleType name="ElectronicPaymentOperation">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Submit" />
+          <xsd:enumeration value="Credit" />
+          <xsd:enumeration value="Reverse" />
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:element name="ElectronicPaymentOperation" nillable="true" type="tns:ElectronicPaymentOperation" />
       <xsd:complexType name="BinaryExpression">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:Expression">
@@ -2115,85 +2224,6 @@
         </xsd:restriction>
       </xsd:simpleType>
       <xsd:element name="BinaryOperator" nillable="true" type="tns:BinaryOperator" />
-      <xsd:complexType name="ReportCategory">
-        <xsd:complexContent mixed="false">
-          <xsd:extension base="tns:Entity">
-            <xsd:sequence />
-          </xsd:extension>
-        </xsd:complexContent>
-      </xsd:complexType>
-      <xsd:element name="ReportCategory" nillable="true" type="tns:ReportCategory" />
-      <xsd:complexType name="ElectronicPayment">
-        <xsd:complexContent mixed="false">
-          <xsd:extension base="tns:Payment">
-            <xsd:sequence>
-              <xsd:element xmlns:q11="http://metratech.com/PaymentBroker" minOccurs="0" name="FailedReason" nillable="true" type="q11:ProviderResponse">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="FailedStatus" nillable="true" type="tns:FailedPaymentStatus" />
-              <xsd:element minOccurs="0" name="FailedUpdated" nillable="true" type="xsd:dateTime" />
-              <xsd:element minOccurs="0" name="Invoice" nillable="true" type="tns:Invoice">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="NumberOfAttempts" nillable="true" type="xsd:int">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="PaymentInstrument" nillable="true" type="tns:PaymentInstrumentMasked">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element minOccurs="0" name="PaymentOperation" type="tns:ElectronicPaymentOperation" />
-              <xsd:element minOccurs="0" name="Reference" nillable="true" type="tns:ElectronicPayment">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-              <xsd:element xmlns:q12="http://schemas.datacontract.org/2004/07/PaymentBroker.Presentation.Enums" minOccurs="0" name="Status" type="q12:TransactionStatus" />
-              <xsd:element minOccurs="0" name="StatusUpdated" type="xsd:dateTime">
-                <xsd:annotation>
-                  <xsd:appinfo>
-                    <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-                  </xsd:appinfo>
-                </xsd:annotation>
-              </xsd:element>
-            </xsd:sequence>
-          </xsd:extension>
-        </xsd:complexContent>
-      </xsd:complexType>
-      <xsd:element name="ElectronicPayment" nillable="true" type="tns:ElectronicPayment" />
-      <xsd:simpleType name="FailedPaymentStatus">
-        <xsd:restriction base="xsd:string">
-          <xsd:enumeration value="Failed" />
-          <xsd:enumeration value="Succeeded" />
-          <xsd:enumeration value="Dismissed" />
-        </xsd:restriction>
-      </xsd:simpleType>
-      <xsd:element name="FailedPaymentStatus" nillable="true" type="tns:FailedPaymentStatus" />
-      <xsd:simpleType name="ElectronicPaymentOperation">
-        <xsd:restriction base="xsd:string">
-          <xsd:enumeration value="Submit" />
-          <xsd:enumeration value="Credit" />
-          <xsd:enumeration value="Reverse" />
-        </xsd:restriction>
-      </xsd:simpleType>
-      <xsd:element name="ElectronicPaymentOperation" nillable="true" type="tns:ElectronicPaymentOperation" />
       <xsd:complexType name="Report">
         <xsd:complexContent mixed="false">
           <xsd:extension base="tns:Entity">
@@ -2212,7 +2242,7 @@
                   </xsd:appinfo>
                 </xsd:annotation>
               </xsd:element>
-              <xsd:element xmlns:q13="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Columns" nillable="true" type="q13:ArrayOfstring">
+              <xsd:element xmlns:q14="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Columns" nillable="true" type="q14:ArrayOfstring">
                 <xsd:annotation>
                   <xsd:appinfo>
                     <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
@@ -2226,7 +2256,7 @@
                   </xsd:appinfo>
                 </xsd:annotation>
               </xsd:element>
-              <xsd:element xmlns:q14="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Order" nillable="true" type="q14:ArrayOfKeyValueOfstringOrderDirectionjdKeJ3ql">
+              <xsd:element xmlns:q15="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Order" nillable="true" type="q15:ArrayOfKeyValueOfstringOrderDirectionjdKeJ3ql">
                 <xsd:annotation>
                   <xsd:appinfo>
                     <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
@@ -2381,7 +2411,7 @@
       <xsd:element name="CreateEntityBulkResponse">
         <xsd:complexType>
           <xsd:sequence>
-            <xsd:element xmlns:q15="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="CreateEntityBulkResult" nillable="true" type="q15:ArrayOfguid" />
+            <xsd:element xmlns:q16="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="CreateEntityBulkResult" nillable="true" type="q16:ArrayOfguid" />
           </xsd:sequence>
         </xsd:complexType>
       </xsd:element>
@@ -2657,7 +2687,7 @@
       <xsd:element name="RetrieveStatementResponse">
         <xsd:complexType>
           <xsd:sequence>
-            <xsd:element xmlns:q16="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="RetrieveStatementResult" nillable="true" type="q16:ArrayOfKeyValueOfstringStatementjdKeJ3ql" />
+            <xsd:element xmlns:q17="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="RetrieveStatementResult" nillable="true" type="q17:ArrayOfKeyValueOfstringStatementjdKeJ3ql" />
           </xsd:sequence>
         </xsd:complexType>
       </xsd:element>
@@ -2729,14 +2759,14 @@
               </xsd:appinfo>
             </xsd:annotation>
           </xsd:element>
-          <xsd:element xmlns:q17="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Description" nillable="true" type="q17:ArrayOfKeyValueOfstringstring">
+          <xsd:element xmlns:q18="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Description" nillable="true" type="q18:ArrayOfKeyValueOfstringstring">
             <xsd:annotation>
               <xsd:appinfo>
                 <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
               </xsd:appinfo>
             </xsd:annotation>
           </xsd:element>
-          <xsd:element xmlns:q18="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Name" nillable="true" type="q18:ArrayOfKeyValueOfstringstring">
+          <xsd:element xmlns:q19="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Name" nillable="true" type="q19:ArrayOfKeyValueOfstringstring">
             <xsd:annotation>
               <xsd:appinfo>
                 <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
@@ -2802,7 +2832,7 @@
               </xsd:appinfo>
             </xsd:annotation>
           </xsd:element>
-          <xsd:element xmlns:q19="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="InstanceDates" nillable="true" type="q19:ArrayOfdateTime">
+          <xsd:element xmlns:q20="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="InstanceDates" nillable="true" type="q20:ArrayOfdateTime">
             <xsd:annotation>
               <xsd:appinfo>
                 <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
@@ -2889,7 +2919,7 @@
             <xsd:complexType>
               <xsd:sequence>
                 <xsd:element name="Key" nillable="true" type="xsd:string" />
-                <xsd:element xmlns:q20="http://metanga.com" name="Value" type="q20:OrderDirection" />
+                <xsd:element xmlns:q21="http://metanga.com" name="Value" type="q21:OrderDirection" />
               </xsd:sequence>
             </xsd:complexType>
           </xsd:element>
@@ -2913,7 +2943,7 @@
             <xsd:complexType>
               <xsd:sequence>
                 <xsd:element name="Key" nillable="true" type="xsd:string" />
-                <xsd:element xmlns:q21="http://metanga.com" name="Value" nillable="true" type="q21:Statement" />
+                <xsd:element xmlns:q22="http://metanga.com" name="Value" nillable="true" type="q22:Statement" />
               </xsd:sequence>
             </xsd:complexType>
           </xsd:element>
@@ -2927,10 +2957,10 @@
       </xsd:complexType>
       <xsd:element name="ArrayOfdateTime" nillable="true" type="tns:ArrayOfdateTime" />
     </xsd:schema>
-    <xsd:schema xmlns:tns="http://metratech.com/PaymentBroker" elementFormDefault="qualified" targetNamespace="http://metratech.com/PaymentBroker">
+    <xsd:schema xmlns:tns="http://schemas.datacontract.org/2004/07/PaymentBroker.Presentation" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/PaymentBroker.Presentation">
       <xsd:complexType name="ProviderResponse">
         <xsd:sequence>
-          <xsd:element xmlns:q22="http://schemas.datacontract.org/2004/07/PaymentBroker.Presentation.Enums" minOccurs="0" name="MetraTechResponseCode" type="q22:PaymentBrokerResponseCode" />
+          <xsd:element xmlns:q23="http://schemas.datacontract.org/2004/07/PaymentBroker.Presentation.Enums" minOccurs="0" name="MetraTechResponseCode" type="q23:PaymentBrokerResponseCode" />
           <xsd:element minOccurs="0" name="MetraTechResponseDescription" nillable="true" type="xsd:string" />
           <xsd:element minOccurs="0" name="ProviderResponseCode" nillable="true" type="xsd:string" />
           <xsd:element minOccurs="0" name="ProviderResponseDescription" nillable="true" type="xsd:string" />
@@ -3704,9 +3734,9 @@
   </wsdl:binding>
   <wsdl:service name="Metanga">
     <wsdl:port name="WSHttpBinding_IEnrollment" binding="tns:WSHttpBinding_IEnrollment">
-      <soap12:address location="https://metangadev01.metratech.com/soapservice" />
+      <soap12:address location="https://metangadev18.metratech.com/soapservice" />
       <wsa10:EndpointReference>
-        <wsa10:Address>https://metangadev01.metratech.com/soapservice</wsa10:Address>
+        <wsa10:Address>https://metangadev18.metratech.com/soapservice</wsa10:Address>
       </wsa10:EndpointReference>
     </wsdl:port>
   </wsdl:service>
