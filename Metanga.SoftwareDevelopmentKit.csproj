@@ -23,8 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>..\bin\Metanga.SoftwareDevelopmentKit.XML</DocumentationFile>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -66,6 +65,7 @@
   <ItemGroup>
     <Compile Include="ControllerParameters.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="MetangaAggregateException.cs" />
     <Compile Include="MetangaClient.cs" />
     <Compile Include="MetangaException.cs" />

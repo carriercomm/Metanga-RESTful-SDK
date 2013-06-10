@@ -197,6 +197,10 @@ namespace Metanga.Example
       //var retryElectronicPayment = new ElectronicPayment {EntityId = Guid.Empty};//Set failed payment EntityId
       //retryElectronicPayment = client.RetryFailedPayment(retryElectronicPayment);
 
+      PrintConsoleMessage("Run Retrieving a collection of entities based on the given report ExternalId...");
+      var resultReport = client.RunReport<NotificationEndpoint>("Report1");
+      PrintConsoleMessage(String.Format("The {0} entities were retrieved.", resultReport.Count()));
+
       PrintConsoleMessage("Closing connection to Metanga...");
       CloseMetangaClient(client);
       EndExample();
