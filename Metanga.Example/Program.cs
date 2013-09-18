@@ -488,6 +488,7 @@ namespace Metanga.Example
       var smartPackageProduct = new PackageProduct
                                   {
                                     Product = product,
+                                    Optional = true,
                                     ProductModel = new BucketGroupModel
                                                      {
                                                        DefaultProduct = product,
