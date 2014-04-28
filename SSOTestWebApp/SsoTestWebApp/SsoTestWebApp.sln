@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SsoTestWebApp", "SsoTestWebApp.csproj", "{DF61E7BF-81C3-47E8-884D-251A1AF87D08}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DF61E7BF-81C3-47E8-884D-251A1AF87D08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF61E7BF-81C3-47E8-884D-251A1AF87D08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF61E7BF-81C3-47E8-884D-251A1AF87D08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF61E7BF-81C3-47E8-884D-251A1AF87D08}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

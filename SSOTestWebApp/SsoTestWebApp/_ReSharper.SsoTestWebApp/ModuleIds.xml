@@ -1,0 +1,4 @@
+<Modules>
+  <Module PersistentId="DF61E7BF-81C3-47E8-884D-251A1AF87D08" ModuleId="SsoTestWebApp" />
+  <Module PersistentId="System.Web, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" ModuleId="System.Web" />
+</Modules>
