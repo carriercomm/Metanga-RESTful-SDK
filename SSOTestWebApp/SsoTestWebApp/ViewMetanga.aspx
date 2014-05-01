@@ -1,0 +1,1 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ViewMetanga.aspx.cs" Inherits="SsoTestWebApp.ViewMetanga" %>

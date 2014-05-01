@@ -1,0 +1,66 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="SsoTestWebApp.SiteMaster" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head runat="server">
+  <title></title>
+  <link href="~/Styles/Site.css" rel="stylesheet" type="text/css" />
+  <asp:ContentPlaceHolder ID="HeadContent" runat="server">
+  </asp:ContentPlaceHolder>
+</head>
+<body>
+  <form runat="server">
+    <div class="page">
+      <div class="header">
+        <div class="title">
+          <h1>Single Sign On Test Site
+          </h1>
+        </div>
+        <div class="loginDisplay">
+          <asp:LoginView ID="HeadLoginView" runat="server" EnableViewState="false">
+            <AnonymousTemplate>
+              [ <a href="~/Account/Login.aspx" id="HeadLoginStatus" runat="server">Change User</a> ]
+            </AnonymousTemplate>
+            <LoggedInTemplate>
+              Welcome <span class="bold">
+                <asp:LoginName ID="HeadLoginName" runat="server" />
+              </span>!
+                        [
+              <asp:LoginStatus ID="HeadLoginStatus" runat="server" LogoutAction="Redirect" LogoutText="Log Out" LogoutPageUrl="~/" />
+              ]
+            </LoggedInTemplate>
+          </asp:LoginView>
+        </div>
+        <div class="clear" style="color: white;">
+          <div style="float: left; width: 100px;">Platform test:</div>
+          <div style="float: left; width: 100px;">
+            <asp:RadioButton ID="Radio1" Text="Local" runat="server" OnCheckedChanged="OnCheckedChanged" GroupName="Env" AutoPostBack="true" />
+            <br />
+            <asp:RadioButton ID="Radio2" Text="Azure" runat="server" OnCheckedChanged="OnCheckedChanged" GroupName="Env" AutoPostBack="true" />
+          </div>
+        </div>
+        <div class="clear hideSkiplink">
+          <asp:Menu ID="NavigationMenu" runat="server" CssClass="menu"
+            EnableViewState="false" IncludeStyleBlock="false" Orientation="Horizontal"
+            OnMenuItemClick="NavigationMenu_MenuItemClick">
+            <Items>
+              <asp:MenuItem NavigateUrl="~/Default.aspx" Text="Home" />
+              <asp:MenuItem Text="Online Bill" Value="billing" />
+              <asp:MenuItem Text="Update Credit Card" Value="updatecreditcard" />
+              <asp:MenuItem Text="Payment History" Value="paymenthistory" />
+              <asp:MenuItem Text="Update Account" Value="updateaccount" />
+            </Items>
+          </asp:Menu>
+        </div>
+      </div>
+      <div class="main">
+        <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+      </div>
+      <div class="clear">
+      </div>
+    </div>
+    <div class="footer">
+    </div>
+  </form>
+</body>
+</html>
